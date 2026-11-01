@@ -1,0 +1,6 @@
+modeller/intfloat:multilingual-e5-small/openvivo/openvino_model.bin filter=lfs diff=lfs merge=lfs -text
+modeller/intfloat:multilingual-e5-small/pytorch_model.bin filter=lfs diff=lfs merge=lfs -text
+modeller/intfloat:multilingual-e5-small/model.safetensors filter=lfs diff=lfs merge=lfs -text
+modeller/intfloat:multilingual-e5-small/onnx/model_O4.onnx filter=lfs diff=lfs merge=lfs -text
+modeller/intfloat:multilingual-e5-small/onnx/model.onnx filter=lfs diff=lfs merge=lfs -text
+modeller/intfloat:multilingual-e5-small/onnx/model_qint8_avx512_vnni.onnx filter=lfs diff=lfs merge=lfs -text
