@@ -27,7 +27,7 @@ jobs:
       - name: Aç
         run: |
           rm -rf modeller
-          unzip -q "/tmp/${{ inputs.asset }}" -d modeller
+          unzip -q "/tmp/${{ inputs.asset }}" -d modeller -x '__MACOSX/*' '*.DS_Store'
 
       - name: 100 MiB üstü dosyaları LFS'e al
         run: |
