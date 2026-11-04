@@ -38,3 +38,17 @@ Notlar:
 - Öneklerle (`query: `, `passage: `) eğitim ve çıkarım betiklerde otomatik yapılır.
 - Küçük öğrenme oranı ve 1 ile 3 epoch yeterlidir; fazlası modelin genel bilgisini bozar.
 - Örnek veri sadece akışı göstermek içindir. Gerçek iyileşme için binlerce gerçek sorgu-belge çifti gerekir.
+
+## mMARCO Türkçe ile eğitim
+
+MS MARCO'nun Türkçeye çevrilmiş sürümü. Yaklaşık 40 milyon üçlü vardır, bir alt küme yeterlidir:
+
+```bash
+python egitim/veri_mmarco.py --adet 100000 --cikti egitim/mmarco_tr.jsonl
+```
+
+```bash
+python egitim/egit.py --veri egitim/mmarco_tr.jsonl --cikti cikti/e5-small-mmarco-tr --epoch 1 --batch 64
+```
+
+İlk indirme yaklaşık 2 GB'dır ve Hugging Face önbelleğine alınır. GPU yoksa `--adet 20000` ile başlayın.

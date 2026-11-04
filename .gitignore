@@ -1,3 +1,5 @@
 cikti/
 __pycache__/
 *.pyc
+egitim/*.jsonl
+!egitim/veri_ornek.jsonl
