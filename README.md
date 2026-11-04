@@ -62,5 +62,16 @@ Actions sekmesinde "Türkçe MS MARCO verisini hazırla" iş akışını çalı�
 
 ```bash
 gunzip mmarco_tr_100000.jsonl.gz
-python egitim/egit.py --veri mmarco_tr_100000.jsonl --cikti cikti/e5-small-mmarco-tr --epoch 1 --batch 64
+python egitim/egit.py --veri mmarco_tr_100000.jsonl --cikti cikti/e5-small-mmarco-tr --test-ayir 5000 --epoch 1 --batch 64
+```
+
+Son 5000 satır eğitimde kullanılmaz, değerlendirme için ayrılır. CPU'da `--en-fazla 20000` ile sınırlayın.
+
+### Değerlendirme
+
+Temel modeli ve ince ayarlı modeli aynı test kümesinde karşılaştırır (nDCG@10, MRR@10, Recall@k):
+
+```bash
+python egitim/degerlendir.py --veri mmarco_tr_100000.jsonl --test 5000 --sorgu 1000 \
+    --model modeller/intfloat-multilingual-e5-small --model cikti/e5-small-mmarco-tr/final
 ```

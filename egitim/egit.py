@@ -39,10 +39,19 @@ def main():
     p.add_argument("--batch", type=int, default=32)
     p.add_argument("--lr", type=float, default=2e-5)
     p.add_argument("--dogrulama-orani", type=float, default=0.1)
+    p.add_argument("--test-ayir", type=int, default=0, help="Sondan bu kadar satırı hiç kullanma (degerlendir.py için)")
+    p.add_argument("--en-fazla", type=int, default=0, help="En fazla bu kadar satırla eğit (0 = hepsi)")
+    p.add_argument("--maks-uzunluk", type=int, default=256, help="Token cinsinden en uzun girdi")
     a = p.parse_args()
 
     model = SentenceTransformer(a.model)
-    ds = load_dataset("json", data_files=a.veri)["train"].map(onek_ekle)
+    model.max_seq_length = a.maks_uzunluk
+    ds = load_dataset("json", data_files=a.veri)["train"]
+    if a.test_ayir:
+        ds = ds.select(range(ds.num_rows - a.test_ayir))
+    if a.en_fazla and ds.num_rows > a.en_fazla:
+        ds = ds.select(range(a.en_fazla))
+    ds = ds.map(onek_ekle)
     if "negative" in ds.column_names and ds.filter(lambda s: not s["negative"]).num_rows:
         ds = ds.remove_columns("negative")  # eksik negatif varsa sütunu bırak
 
