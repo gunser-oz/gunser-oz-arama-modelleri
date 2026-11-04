@@ -20,19 +20,36 @@ import random
 import sys
 from pathlib import Path
 
-from huggingface_hub import hf_hub_download
+from huggingface_hub import HfApi, hf_hub_download
 
 DEPO = "unicamp-dl/mmarco"
-DOSYALAR = {
-    "sorgular": "data/google/queries/train/turkish_queries.train.tsv",
-    "koleksiyon": "data/google/collections/turkish_collection.tsv",
-    "ucluler": "data/triples.train.ids.small.tsv",
+# Depodaki yollar zamanla değişebildiği için dosyalar listeden aranır
+DESENLER = {
+    "sorgular": lambda y: "turkish" in y and "quer" in y and "train" in y and y.endswith(".tsv"),
+    "koleksiyon": lambda y: "turkish" in y and "collection" in y and y.endswith(".tsv"),
+    "ucluler": lambda y: "triples" in y and "ids" in y and "small" in y and y.endswith(".tsv"),
 }
+_liste = None
+
+
+def hf_yol(ad):
+    global _liste
+    if _liste is None:
+        _liste = HfApi().list_repo_files(DEPO, repo_type="dataset")
+    adaylar = sorted(y for y in _liste if DESENLER[ad](y.lower()))
+    if not adaylar:
+        ornek = [y for y in _liste if "turkish" in y.lower()][:20]
+        raise SystemExit(f"{ad} için dosya bulunamadı. Türkçe içeren yollar: {ornek}")
+    # "google" çevirisi varsa onu tercih et (helsinki'ye göre daha kaliteli)
+    adaylar.sort(key=lambda y: ("google" not in y.lower(), y))
+    print(f"{ad}: {adaylar[0]}", file=sys.stderr)
+    return adaylar[0]
 
 
 def indir(ad):
-    print(f"İndiriliyor: {DOSYALAR[ad]}", file=sys.stderr)
-    return hf_hub_download(DEPO, DOSYALAR[ad], repo_type="dataset")
+    yol = hf_yol(ad)
+    print(f"İndiriliyor: {yol}", file=sys.stderr)
+    return hf_hub_download(DEPO, yol, repo_type="dataset")
 
 
 def tsv_oku(yol):
