@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontrol Kartları</title>
+<style>
+  :root { --bg:#f6f7f9; --kart:#fff; --metin:#1b1f24; --soluk:#6b7280; --vurgu:#1f6feb; --cizgi:#e5e7eb; --iyi:#1a7f37; --kotu:#d1242f; --bekle:#9a6700; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1115; --kart:#181b21; --metin:#e6e8eb; --soluk:#9aa3ad; --vurgu:#58a6ff; --cizgi:#2a2f37; --iyi:#3fb950; --kotu:#f85149; --bekle:#d29922; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--metin); }
+  main { max-width:1100px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .alt { color:var(--soluk); font-size:14px; margin:0 0 24px; }
+  .alt a { color:var(--vurgu); }
+  .izgara { display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+  .kart { background:var(--kart); border:1px solid var(--cizgi); border-radius:12px; padding:20px; }
+  .kart h2 { margin:0 0 14px; font-size:13px; color:var(--soluk); text-transform:uppercase; letter-spacing:.04em; }
+  .satir { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-top:1px solid var(--cizgi); font-size:14px; }
+  .satir:first-of-type { border-top:none; }
+  .satir span:last-child { font-variant-numeric:tabular-nums; text-align:right; }
+  .buyuk { font-size:34px; font-weight:700; color:var(--vurgu); line-height:1.1; }
+  .not { font-size:12px; color:var(--soluk); margin-top:8px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:8px 6px; border-top:1px solid var(--cizgi); }
+  th { color:var(--soluk); font-weight:500; font-size:12px; border-top:none; }
+  td.sayi, th.sayi { text-align:right; font-variant-numeric:tabular-nums; }
+  .fark { font-size:12px; margin-left:6px; }
+  .arti { color:var(--iyi); } .eksi { color:var(--kotu); }
+  .kontrol { display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--cizgi); font-size:14px; }
+  .kontrol:first-of-type { border-top:none; }
+  .rozet { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex:0 0 22px; }
+  .ok { background:var(--iyi); } .hayir { background:var(--kotu); } .bekle { background:var(--bekle); }
+  .bos { color:var(--soluk); font-size:14px; }
+  .genis { grid-column:1 / -1; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Kontrol Kartları</h1>
+  <p class="alt">Model, eğitim, değerlendirme ve indeks durumu · <a href="/">Arama sayfasına dön</a></p>
+  <div class="izgara" id="kartlar"><p class="bos">Yükleniyor…</p></div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const f = (x, b=3) => typeof x === "number" ? x.toFixed(b) : "–";
+const kisa = ad => ad.split("/").filter(Boolean).slice(-2).join("/");
+
+function satir(k, v) { return `<div class="satir"><span>${k}</span><span>${v ?? "–"}</span></div>`; }
+
+function modelKarti(m) {
+  return `<div class="kart"><h2>Model</h2>
+    <div class="buyuk">${m.boyut}<span style="font-size:14px;color:var(--soluk)"> boyutlu vektör</span></div>
+    ${satir("Temel model", m.ad)}${satir("Katman", m.katman)}${satir("En uzun girdi", m.maks_token + " token")}
+    ${satir("Yüklü modeller", m.yuklu.join(", "))}${satir("İndeksli parça", m.belge_sayisi)}</div>`;
+}
+
+function egitimKarti(ad, o) {
+  if (!o) return "";
+  const dk = o.dogrulama_kaybi;
+  return `<div class="kart"><h2>Eğitim · ${ad}</h2>
+    <div class="buyuk">${f(o.egitim_kaybi, 4)}<span style="font-size:14px;color:var(--soluk)"> eğitim kaybı</span></div>
+    ${satir("Eğitim satırı", o.egitim_satiri.toLocaleString("tr"))}${satir("Teste ayrılan", o.test_ayrilan.toLocaleString("tr"))}
+    ${satir("Epoch / batch", o.epoch + " / " + o.batch)}${satir("Öğrenme oranı", o.ogrenme_orani)}
+    ${satir("Adım", o.adim)}${satir("Süre", o.sure_dk + " dk")}
+    ${dk && dk.length ? satir("Doğrulama kaybı", dk.join(" → ")) : ""}
+    <p class="not">${o.kayip} · ${o.tarih}</p></div>`;
+}
+
+function degerlendirmeKarti(d) {
+  if (!d) return `<div class="kart genis"><h2>Değerlendirme</h2><p class="bos">Henüz rapor yok. <code>egitim/degerlendir.py --rapor cikti/degerlendirme.json</code> çalıştırın.</p></div>`;
+  const adlar = Object.keys(d.modeller);
+  const olc = ["ndcg@10", "mrr@10", "recall@1", "recall@10"];
+  const temel = d.modeller[adlar[0]];
+  const baslik = adlar.map(a => `<th class="sayi">${kisa(a)}</th>`).join("");
+  const satirlar = olc.map(o => `<tr><td>${o}</td>${adlar.map((a, i) => {
+    const v = d.modeller[a][o]; const fark = i ? v - temel[o] : null;
+    const r = fark == null ? "" : `<span class="fark ${fark >= 0 ? "arti" : "eksi"}">${fark >= 0 ? "+" : ""}${f(fark)}</span>`;
+    return `<td class="sayi">${f(v)}${r}</td>`; }).join("")}</tr>`).join("");
+  return `<div class="kart genis"><h2>Değerlendirme · ${d.sorgu_sayisi} sorgu, ${d.pasaj_sayisi} pasaj (eğitimde kullanılmayan son satırlar)</h2>
+    <table><thead><tr><th>Ölçüt</th>${baslik}</tr></thead><tbody>${satirlar}</tbody></table>
+    <p class="not">nDCG@10 sıralama kalitesi, MRR@10 doğru belgenin ortalama sırası, Recall@1 ilk sırada bulma oranı, Recall@10 ilk 10'da bulma oranı. İlk sütun temel model, yanındaki fark ona göredir.</p></div>`;
+}
+
+function indeksKarti(i) {
+  if (!i) return `<div class="kart"><h2>Belge indeksi</h2><p class="bos">Sunucu indeks olmadan çalışıyor. <code>deneme/indeksle.py</code> ile kurup <code>--indeks</code> verin.</p></div>`;
+  return `<div class="kart"><h2>Belge indeksi</h2>
+    <div class="buyuk">${i.parca_sayisi}<span style="font-size:14px;color:var(--soluk)"> parça</span></div>
+    ${satir("Dosya", i.dosya_sayisi)}${satir("Vektörleyen model", kisa(i.model))}${satir("Tür", "FAISS IndexFlatIP (kosinüs)")}</div>`;
+}
+
+function kontrolKarti(k) {
+  return `<div class="kart"><h2>Kontrol listesi</h2>${k.map(x => {
+    const s = x.durum === true ? ["ok", "✓"] : x.durum === false ? ["hayir", "✕"] : ["bekle", "…"];
+    return `<div class="kontrol"><span class="rozet ${s[0]}">${s[1]}</span>${x.ad}</div>`; }).join("")}</div>`;
+}
+
+fetch("/kontrol-veri").then(r => r.json()).then(v => {
+  $("#kartlar").innerHTML = modelKarti(v.model) + indeksKarti(v.indeks) + kontrolKarti(v.kontroller)
+    + Object.entries(v.egitimler).map(([a, o]) => egitimKarti(a, o)).join("") + degerlendirmeKarti(v.degerlendirme);
+}).catch(e => $("#kartlar").innerHTML = `<p class="bos">Veri alınamadı: ${e.message}</p>`);
+</script>
+</body>
+</html>

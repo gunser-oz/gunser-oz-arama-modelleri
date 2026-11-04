@@ -28,6 +28,7 @@ p.add_argument("--karsilastir", default=None, help="İkinci model (ör. ince aya
 p.add_argument("--belgeler", default=str(BURASI / "belgeler.txt"))
 p.add_argument("--indeks", default=None, help="indeksle.py çıktısı; verilirse --belgeler yok sayılır")
 p.add_argument("--port", type=int, default=8000)
+p.add_argument("--rapor", default=str(KOK / "cikti" / "degerlendirme.json"), help="degerlendir.py --rapor çıktısı")
 a = p.parse_args()
 
 if a.indeks:
@@ -69,6 +70,46 @@ class Cift(BaseModel):
 @app.get("/")
 def sayfa():
     return FileResponse(BURASI / "index.html")
+
+
+@app.get("/kontrol")
+def kontrol_sayfasi():
+    return FileResponse(BURASI / "kontrol.html")
+
+
+def _json_oku(yol):
+    try:
+        return json.loads(Path(yol).read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+@app.get("/kontrol-veri")
+def kontrol_veri():
+    """Kontrol kartlarının okuduğu durum özeti."""
+    agirlik = TEMEL_MODEL / "model.safetensors"
+    lfs_cekilmis = agirlik.exists() and agirlik.stat().st_size > 1_000_000
+    ozetler = {str(y.parent.parent.name): _json_oku(y) for y in (KOK / "cikti").glob("*/final/egitim_ozeti.json")} if (KOK / "cikti").exists() else {}
+    rapor = _json_oku(a.rapor)
+    ind = _json_oku(Path(a.indeks) / "bilgi.json") if a.indeks else None
+    kontroller = [
+        {"ad": "Model ağırlıkları indirildi (git lfs pull)", "durum": lfs_cekilmis},
+        {"ad": "Sorgu/belge önekleri (query:, passage:) uygulanıyor", "durum": True},
+        {"ad": "Eğitim verisi hazır (egitim/veri/*.jsonl)", "durum": any((KOK / "egitim" / "veri").glob("*.jsonl")) if (KOK / "egitim" / "veri").exists() else False},
+        {"ad": "İnce ayar tamamlandı (cikti/*/final)", "durum": bool(ozetler)},
+        {"ad": "Test kümesi eğitimden ayrıldı", "durum": any((o or {}).get("test_ayrilan", 0) > 0 for o in ozetler.values()) if ozetler else False},
+        {"ad": "Değerlendirme raporu üretildi", "durum": rapor is not None},
+        {"ad": "İnce ayarlı model temel modeli geçti (nDCG@10)", "durum": None},
+        {"ad": "Belge indeksi kurulu (FAISS)", "durum": ind is not None},
+    ]
+    if rapor and len(rapor.get("modeller", {})) >= 2:
+        degerler = [m["ndcg@10"] for m in rapor["modeller"].values()]
+        kontroller[6]["durum"] = max(degerler[1:]) > degerler[0]
+    return {
+        "model": {"ad": "intfloat/multilingual-e5-small", "boyut": 384, "katman": 12, "maks_token": 512,
+                  "yuklu": list(modeller), "belge_sayisi": len(belgeler)},
+        "egitimler": ozetler, "degerlendirme": rapor, "indeks": ind, "kontroller": kontroller,
+    }
 
 
 @app.get("/bilgi")

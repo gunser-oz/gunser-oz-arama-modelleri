@@ -21,6 +21,7 @@ def main():
     p.add_argument("--test", type=int, default=5000, help="Sondan kaç satır korpusa girer")
     p.add_argument("--sorgu", type=int, default=1000, help="Bunların kaçı sorgu olarak kullanılır")
     p.add_argument("--model", action="append", required=True)
+    p.add_argument("--rapor", default=None, help="Sonuçları bu JSON dosyasına yaz (kontrol kartları okur)")
     a = p.parse_args()
 
     satirlar = [json.loads(s) for s in open(a.veri, encoding="utf-8")][-a.test:]
@@ -39,11 +40,22 @@ def main():
 
     print(f"{len(sorgular)} sorgu, {len(korpus)} pasaj")
     ev = InformationRetrievalEvaluator(sorgular, korpus, ilgili, name="tr", show_progress_bar=False)
+    rapor = {"veri": a.veri, "sorgu_sayisi": len(sorgular), "pasaj_sayisi": len(korpus), "modeller": {}}
     for m in a.model:
         r = ev(SentenceTransformer(m))
         print(f"\n{m}")
+        olcumler = {}
         for k in ("tr_cosine_ndcg@10", "tr_cosine_mrr@10", "tr_cosine_recall@1", "tr_cosine_recall@10"):
-            print(f"  {k.replace('tr_cosine_', ''):10s} {r[k]:.4f}")
+            ad = k.replace("tr_cosine_", "")
+            olcumler[ad] = round(float(r[k]), 4)
+            print(f"  {ad:10s} {r[k]:.4f}")
+        rapor["modeller"][m] = olcumler
+    if a.rapor:
+        import json as _json
+        from pathlib import Path as _P
+        _P(a.rapor).parent.mkdir(parents=True, exist_ok=True)
+        _P(a.rapor).write_text(_json.dumps(rapor, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"\nRapor yazıldı: {a.rapor}")
 
 
 if __name__ == "__main__":

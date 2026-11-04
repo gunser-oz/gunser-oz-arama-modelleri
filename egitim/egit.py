@@ -8,6 +8,8 @@ Kullanım:
   python egitim/egit.py --veri egitim/veri_ornek.jsonl --cikti cikti/e5-small-tr --epoch 2
 """
 import argparse
+import json
+import time
 from pathlib import Path
 
 from datasets import load_dataset
@@ -81,10 +83,34 @@ def main():
     trainer = SentenceTransformerTrainer(
         model=model, args=args, train_dataset=egitim, eval_dataset=dogrulama, loss=kayip
     )
-    trainer.train()
+    baslangic = time.time()
+    sonuc = trainer.train()
+    sure = time.time() - baslangic
 
     son = Path(a.cikti) / "final"
     model.save_pretrained(str(son))
+    dogrulama_kaybi = None
+    if dogrulama:
+        kayitlar = [k for k in trainer.state.log_history if "eval_loss" in k]
+        dogrulama_kaybi = [round(k["eval_loss"], 4) for k in kayitlar]
+    ozet = {
+        "temel_model": a.model,
+        "veri": a.veri,
+        "egitim_satiri": egitim.num_rows,
+        "dogrulama_satiri": dogrulama.num_rows if dogrulama else 0,
+        "test_ayrilan": a.test_ayir,
+        "epoch": a.epoch,
+        "batch": a.batch,
+        "ogrenme_orani": a.lr,
+        "maks_uzunluk": a.maks_uzunluk,
+        "kayip": "MultipleNegativesRankingLoss (InfoNCE, scale=50)",
+        "egitim_kaybi": round(sonuc.training_loss, 4),
+        "dogrulama_kaybi": dogrulama_kaybi,
+        "adim": sonuc.global_step,
+        "sure_dk": round(sure / 60, 1),
+        "tarih": time.strftime("%Y-%m-%d %H:%M"),
+    }
+    (son / "egitim_ozeti.json").write_text(json.dumps(ozet, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Model kaydedildi: {son}")
 
 
