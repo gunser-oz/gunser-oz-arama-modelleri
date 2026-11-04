@@ -39,9 +39,10 @@ Notlar:
 - Küçük öğrenme oranı ve 1 ile 3 epoch yeterlidir; fazlası modelin genel bilgisini bozar.
 - Örnek veri sadece akışı göstermek içindir. Gerçek iyileşme için binlerce gerçek sorgu-belge çifti gerekir.
 
-## mMARCO Türkçe ile eğitim
+## Türkçe MS MARCO ile eğitim
 
-MS MARCO'nun Türkçeye çevrilmiş sürümü. Yaklaşık 40 milyon üçlü vardır, bir alt küme yeterlidir:
+Resmi mMARCO setinde Türkçe yoktur; topluluk çevirisi `newmindai/ms-marco-turkish-triplets` kullanılır
+(sorgu, ilgili pasaj, ilgisiz pasaj). Makine çevirisi olduğu için bazı cümleler bozuk olabilir. Bir alt küme yeterlidir:
 
 ```bash
 python egitim/veri_mmarco.py --adet 100000 --cikti egitim/mmarco_tr.jsonl
@@ -51,12 +52,12 @@ python egitim/veri_mmarco.py --adet 100000 --cikti egitim/mmarco_tr.jsonl
 python egitim/egit.py --veri egitim/mmarco_tr.jsonl --cikti cikti/e5-small-mmarco-tr --epoch 1 --batch 64
 ```
 
-İlk indirme yaklaşık 2 GB'dır ve Hugging Face önbelleğine alınır. GPU yoksa `--adet 20000` ile başlayın.
+Veri akış halinde okunur, sadece istenen kadarı iner. GPU yoksa `--adet 20000` ile başlayın.
 
 ### GitHub Actions ile veri hazırlama
 
-Actions sekmesinde "mMARCO verisini hazırla" iş akışını çalıştırın. Release'deki mMARCO dosyalarını
-(zip, parçalı zip veya düz tsv) açar, yoksa Hugging Face'ten indirir, JSONL üretip aynı release'e yükler.
+Actions sekmesinde "Türkçe MS MARCO verisini hazırla" iş akışını çalıştırın. Hugging Face'ten veriyi
+çekip JSONL üretir ve release'e ek olarak yükler.
 Çıkan dosyayı indirip eğitimde kullanın:
 
 ```bash

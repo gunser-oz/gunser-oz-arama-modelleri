@@ -1,8 +1,7 @@
-name: mMARCO verisini hazırla
+name: Türkçe MS MARCO verisini hazırla
 
-# Release'deki mMARCO dosyalarını (zip, parçalı zip veya düz tsv) açar,
-# eğitim JSONL'ini üretir ve aynı release'e ek olarak yükler.
-# Release'de dosya yoksa doğrudan Hugging Face'ten indirir.
+# Hugging Face'teki Türkçe MS MARCO çevirisinden eğitim JSONL'i üretir
+# ve sıkıştırıp release'e ek olarak yükler. Depoya büyük dosya girmez.
 
 on:
   workflow_dispatch:
@@ -11,8 +10,12 @@ on:
         description: Release tag
         required: true
         default: veri-mmarco-tr
+      kaynak:
+        description: Hugging Face veri seti
+        required: true
+        default: newmindai/ms-marco-turkish-triplets
       adet:
-        description: Kaç sorgu-belge üçlüsü üretilecek
+        description: Kaç sorgu-belge çifti üretilecek
         required: true
         default: "100000"
 
@@ -24,54 +27,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Release eklerini indir
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p /tmp/veri
-          gh release download "${{ inputs.tag }}" -D /tmp/veri || echo "Release'de ek yok"
-          ls -la /tmp/veri
-
-      - name: Parçaları birleştir ve zip'leri aç
-        run: |
-          cd /tmp/veri
-          # split ile bölünmüş dosyalar: ad.part_aa, ad.part_ab ...
-          for ilk in *.part_aa; do
-            [ -e "$ilk" ] || continue
-            ad="${ilk%.part_aa}"
-            cat "$ad".part_* > "$ad" && rm "$ad".part_*
-          done
-          for z in *.zip; do
-            [ -e "$z" ] || continue
-            unzip -o -q "$z" -x '__MACOSX/*' '*.DS_Store' && rm "$z"
-          done
-          ls -la
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Bağımlılıklar
-        run: pip install huggingface_hub
+        run: pip install datasets
 
       - name: JSONL üret
         run: |
-          cd /tmp/veri
-          q=$(find . -name 'turkish_queries.train.tsv' | head -1)
-          c=$(find . -name 'turkish_collection.tsv' | head -1)
-          t=$(find . -name 'triples.train.ids.small.tsv' | head -1)
-          ek=""
-          [ -n "$q" ] && ek="$ek --sorgular $q"
-          [ -n "$c" ] && ek="$ek --koleksiyon $c"
-          [ -n "$t" ] && ek="$ek --ucluler $t"
-          echo "Yerel dosyalar: $ek"
-          python "$GITHUB_WORKSPACE/egitim/veri_mmarco.py" --adet "${{ inputs.adet }}" \
-            --cikti /tmp/mmarco_tr_${{ inputs.adet }}.jsonl $ek
+          python egitim/veri_mmarco.py --kaynak "${{ inputs.kaynak }}" \
+            --adet "${{ inputs.adet }}" --cikti /tmp/mmarco_tr_${{ inputs.adet }}.jsonl
+          head -c 600 /tmp/mmarco_tr_${{ inputs.adet }}.jsonl; echo
+          wc -l /tmp/mmarco_tr_${{ inputs.adet }}.jsonl
 
-      - name: JSONL'i release'e yükle
+      - name: Release'e yükle
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gzip -k /tmp/mmarco_tr_${{ inputs.adet }}.jsonl
+          gh release view "${{ inputs.tag }}" >/dev/null 2>&1 || \
+            gh release create "${{ inputs.tag }}" --title "Türkçe MS MARCO eğitim verisi" --notes "veri_mmarco.py ile üretildi"
           gh release upload "${{ inputs.tag }}" /tmp/mmarco_tr_${{ inputs.adet }}.jsonl.gz --clobber
           echo "Yüklendi: mmarco_tr_${{ inputs.adet }}.jsonl.gz"
