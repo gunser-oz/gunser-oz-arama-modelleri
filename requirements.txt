@@ -1,0 +1,5 @@
+sentence-transformers>=3.0
+datasets
+fastapi
+uvicorn
+accelerate>=1.1.0

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arama Modeli Deneme</title>
+<style>
+  :root { --bg:#f6f7f9; --kart:#fff; --metin:#1b1f24; --soluk:#6b7280; --vurgu:#1f6feb; --cizgi:#e5e7eb; --bar:#dbeafe; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1115; --kart:#181b21; --metin:#e6e8eb; --soluk:#9aa3ad; --vurgu:#58a6ff; --cizgi:#2a2f37; --bar:#1e3a5f; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--metin); }
+  main { max-width:960px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .alt { color:var(--soluk); font-size:14px; margin:0 0 24px; }
+  .sekmeler { display:flex; gap:8px; margin-bottom:16px; }
+  .sekmeler button { background:none; border:1px solid var(--cizgi); color:var(--metin); padding:8px 14px; border-radius:8px; cursor:pointer; font-size:14px; }
+  .sekmeler button.aktif { border-color:var(--vurgu); color:var(--vurgu); font-weight:600; }
+  .kart { background:var(--kart); border:1px solid var(--cizgi); border-radius:12px; padding:20px; margin-bottom:16px; }
+  label { display:block; font-size:13px; color:var(--soluk); margin-bottom:6px; }
+  input, textarea { width:100%; font:inherit; padding:10px 12px; border:1px solid var(--cizgi); border-radius:8px; background:var(--bg); color:var(--metin); }
+  textarea { min-height:70px; resize:vertical; }
+  .satir { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
+  .satir > div { flex:1; min-width:200px; }
+  .btn { background:var(--vurgu); color:#fff; border:none; padding:11px 18px; border-radius:8px; font:inherit; font-weight:600; cursor:pointer; }
+  .btn:disabled { opacity:.5; cursor:wait; }
+  .sonuclar { display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+  .sonuclar h3 { margin:0 0 10px; font-size:14px; color:var(--soluk); text-transform:uppercase; letter-spacing:.04em; }
+  .sonuc { padding:10px 0; border-top:1px solid var(--cizgi); font-size:14px; line-height:1.45; }
+  .sonuc:first-of-type { border-top:none; }
+  .skor { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--soluk); margin-top:6px; }
+  .bar { flex:1; height:6px; background:var(--cizgi); border-radius:3px; overflow:hidden; }
+  .bar i { display:block; height:100%; background:var(--vurgu); }
+  .buyuk { font-size:40px; font-weight:700; color:var(--vurgu); }
+  .not { font-size:13px; color:var(--soluk); margin-top:8px; }
+  .hata { color:#d1242f; font-size:14px; }
+  .gizli { display:none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Arama Modeli Deneme</h1>
+  <p class="alt" id="bilgi">Model yükleniyor…</p>
+
+  <div class="sekmeler">
+    <button class="aktif" data-sekme="ara">Anlamsal arama</button>
+    <button data-sekme="benzerlik">İki metin benzerliği</button>
+  </div>
+
+  <section id="sekme-ara">
+    <div class="kart">
+      <div class="satir">
+        <div><label>Sorgu</label><input id="sorgu" placeholder="örn. ev sahibi kirayı ne kadar artırabilir" autofocus></div>
+        <div style="flex:0 0 90px"><label>Sonuç</label><input id="k" type="number" value="5" min="1" max="20"></div>
+        <button class="btn" id="araBtn">Ara</button>
+      </div>
+      <p class="not">Sorgu, anahtar kelime tutmasa da anlamca en yakın belgelerle eşleştirilir. Skor kosinüs benzerliğidir; önemli olan sıralamadır.</p>
+    </div>
+    <div class="sonuclar" id="araSonuc"></div>
+  </section>
+
+  <section id="sekme-benzerlik" class="gizli">
+    <div class="kart">
+      <label>Metin A</label><textarea id="a">Kiracı sözleşmeyi nasıl sona erdirir?</textarea>
+      <label style="margin-top:12px">Metin B</label><textarea id="b">Kira sözleşmesinin feshi için yazılı bildirim gerekir.</textarea>
+      <div style="margin-top:12px"><button class="btn" id="benzerlikBtn">Karşılaştır</button></div>
+    </div>
+    <div class="sonuclar" id="benzerlikSonuc"></div>
+  </section>
+
+  <p class="hata" id="hata"></p>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const adlar = { temel: "Temel model", ince_ayar: "İnce ayarlı model" };
+
+fetch("/bilgi").then(r => r.json()).then(b => {
+  $("#bilgi").textContent = `${b.modeller.map(m => adlar[m] || m).join(" ve ")} yüklü · ${b.belge_sayisi} belge indekslendi`;
+}).catch(() => $("#bilgi").textContent = "Sunucuya ulaşılamadı. Önce deneme/sunucu.py çalıştırın.");
+
+document.querySelectorAll(".sekmeler button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".sekmeler button").forEach(x => x.classList.toggle("aktif", x === b));
+  $("#sekme-ara").classList.toggle("gizli", b.dataset.sekme !== "ara");
+  $("#sekme-benzerlik").classList.toggle("gizli", b.dataset.sekme !== "benzerlik");
+});
+
+async function istek(yol, govde, btn) {
+  $("#hata").textContent = ""; btn.disabled = true;
+  try {
+    const r = await fetch(yol, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(govde) });
+    if (!r.ok) throw new Error(await r.text());
+    return await r.json();
+  } catch (e) { $("#hata").textContent = "Hata: " + e.message; }
+  finally { btn.disabled = false; }
+}
+
+$("#araBtn").onclick = async () => {
+  const sorgu = $("#sorgu").value.trim(); if (!sorgu) return;
+  const veri = await istek("/ara", { sorgu, k: +$("#k").value }, $("#araBtn")); if (!veri) return;
+  $("#araSonuc").innerHTML = Object.entries(veri).map(([ad, liste]) => `
+    <div class="kart"><h3>${adlar[ad] || ad}</h3>
+      ${liste.map(s => `<div class="sonuc">${s.belge}
+        <div class="skor"><div class="bar"><i style="width:${Math.max(0,(s.skor-0.6)/0.4*100)}%"></i></div>${s.skor.toFixed(3)}</div></div>`).join("")}
+    </div>`).join("");
+};
+$("#sorgu").addEventListener("keydown", e => { if (e.key === "Enter") $("#araBtn").click(); });
+
+$("#benzerlikBtn").onclick = async () => {
+  const veri = await istek("/benzerlik", { a:$("#a").value, b:$("#b").value }, $("#benzerlikBtn")); if (!veri) return;
+  $("#benzerlikSonuc").innerHTML = Object.entries(veri).map(([ad, skor]) => `
+    <div class="kart"><h3>${adlar[ad] || ad}</h3><div class="buyuk">${skor.toFixed(3)}</div>
+    <p class="not">E5 modelinde skorlar genelde 0.7 ile 1.0 arasında toplanır; mutlak değer değil, farklı çiftler arasındaki fark anlamlıdır.</p></div>`).join("");
+};
+</script>
+</body>
+</html>
