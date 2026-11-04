@@ -8,6 +8,8 @@ mMARCO Türkçe setini indirir ve egit.py'nin beklediği JSONL formatına çevir
 
 Kullanım:
   python egitim/veri_mmarco.py --adet 100000 --cikti egitim/mmarco_tr.jsonl
+  # Dosyalar eldeyse:
+  python egitim/veri_mmarco.py --sorgular q.tsv --koleksiyon c.tsv --ucluler t.tsv --adet 100000
 
 100k üçlü CPU'da birkaç saat, GPU'da yarım saat civarı eğitim demektir.
 """
@@ -45,11 +47,18 @@ def main():
     p.add_argument("--adet", type=int, default=100_000, help="Kaç üçlü alınacak")
     p.add_argument("--cikti", default="egitim/mmarco_tr.jsonl")
     p.add_argument("--atla", type=int, default=0, help="Üçlü dosyasında kaç satır atlanacak")
+    p.add_argument("--sorgular", help="Yerel dosya (verilmezse Hugging Face'ten iner)")
+    p.add_argument("--koleksiyon", help="Yerel dosya (verilmezse Hugging Face'ten iner)")
+    p.add_argument("--ucluler", help="Yerel dosya (verilmezse Hugging Face'ten iner)")
     a = p.parse_args()
+    yerel = {"sorgular": a.sorgular, "koleksiyon": a.koleksiyon, "ucluler": a.ucluler}
+
+    def yol(ad):
+        return yerel[ad] or indir(ad)
 
     # 1) İlk N üçlüyü oku, hangi sorgu ve pasajların gerektiğini belirle
     ucluler = []
-    with open(indir("ucluler"), encoding="utf-8") as f:
+    with open(yol("ucluler"), encoding="utf-8") as f:
         for i, satir in enumerate(f):
             if i < a.atla:
                 continue
@@ -62,9 +71,9 @@ def main():
     print(f"{len(ucluler)} üçlü, {len(gerekli_q)} sorgu, {len(gerekli_p)} pasaj gerekli", file=sys.stderr)
 
     # 2) Sadece gerekli sorgu ve pasajları belleğe al (koleksiyon tek geçişte taranır)
-    sorgular = {k: v for k, v in tsv_oku(indir("sorgular")) if k in gerekli_q}
+    sorgular = {k: v for k, v in tsv_oku(yol("sorgular")) if k in gerekli_q}
     pasajlar = {}
-    for k, v in tsv_oku(indir("koleksiyon")):
+    for k, v in tsv_oku(yol("koleksiyon")):
         if k in gerekli_p:
             pasajlar[k] = v
             if len(pasajlar) == len(gerekli_p):

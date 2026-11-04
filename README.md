@@ -52,3 +52,14 @@ python egitim/egit.py --veri egitim/mmarco_tr.jsonl --cikti cikti/e5-small-mmarc
 ```
 
 İlk indirme yaklaşık 2 GB'dır ve Hugging Face önbelleğine alınır. GPU yoksa `--adet 20000` ile başlayın.
+
+### GitHub Actions ile veri hazırlama
+
+Actions sekmesinde "mMARCO verisini hazırla" iş akışını çalıştırın. Release'deki mMARCO dosyalarını
+(zip, parçalı zip veya düz tsv) açar, yoksa Hugging Face'ten indirir, JSONL üretip aynı release'e yükler.
+Çıkan dosyayı indirip eğitimde kullanın:
+
+```bash
+gunzip mmarco_tr_100000.jsonl.gz
+python egitim/egit.py --veri mmarco_tr_100000.jsonl --cikti cikti/e5-small-mmarco-tr --epoch 1 --batch 64
+```

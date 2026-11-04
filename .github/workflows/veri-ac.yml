@@ -1,0 +1,77 @@
+name: mMARCO verisini hazırla
+
+# Release'deki mMARCO dosyalarını (zip, parçalı zip veya düz tsv) açar,
+# eğitim JSONL'ini üretir ve aynı release'e ek olarak yükler.
+# Release'de dosya yoksa doğrudan Hugging Face'ten indirir.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag
+        required: true
+        default: veri-mmarco-tr
+      adet:
+        description: Kaç sorgu-belge üçlüsü üretilecek
+        required: true
+        default: "100000"
+
+jobs:
+  hazirla:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Release eklerini indir
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/veri
+          gh release download "${{ inputs.tag }}" -D /tmp/veri || echo "Release'de ek yok"
+          ls -la /tmp/veri
+
+      - name: Parçaları birleştir ve zip'leri aç
+        run: |
+          cd /tmp/veri
+          # split ile bölünmüş dosyalar: ad.part_aa, ad.part_ab ...
+          for ilk in *.part_aa; do
+            [ -e "$ilk" ] || continue
+            ad="${ilk%.part_aa}"
+            cat "$ad".part_* > "$ad" && rm "$ad".part_*
+          done
+          for z in *.zip; do
+            [ -e "$z" ] || continue
+            unzip -o -q "$z" -x '__MACOSX/*' '*.DS_Store' && rm "$z"
+          done
+          ls -la
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bağımlılıklar
+        run: pip install huggingface_hub
+
+      - name: JSONL üret
+        run: |
+          cd /tmp/veri
+          q=$(find . -name 'turkish_queries.train.tsv' | head -1)
+          c=$(find . -name 'turkish_collection.tsv' | head -1)
+          t=$(find . -name 'triples.train.ids.small.tsv' | head -1)
+          ek=""
+          [ -n "$q" ] && ek="$ek --sorgular $q"
+          [ -n "$c" ] && ek="$ek --koleksiyon $c"
+          [ -n "$t" ] && ek="$ek --ucluler $t"
+          echo "Yerel dosyalar: $ek"
+          python "$GITHUB_WORKSPACE/egitim/veri_mmarco.py" --adet "${{ inputs.adet }}" \
+            --cikti /tmp/mmarco_tr_${{ inputs.adet }}.jsonl $ek
+
+      - name: JSONL'i release'e yükle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gzip -k /tmp/mmarco_tr_${{ inputs.adet }}.jsonl
+          gh release upload "${{ inputs.tag }}" /tmp/mmarco_tr_${{ inputs.adet }}.jsonl.gz --clobber
+          echo "Yüklendi: mmarco_tr_${{ inputs.adet }}.jsonl.gz"
