@@ -24,9 +24,18 @@ from huggingface_hub import HfApi, hf_hub_download
 
 DEPO = "unicamp-dl/mmarco"
 # Depodaki yollar zamanla değişebildiği için dosyalar listeden aranır
+import re
+
+_TR = re.compile(r"turkish|(^|[/_.-])tr([/_.-]|$)")
+
+
+def _tr(y):
+    return bool(_TR.search(y))
+
+
 DESENLER = {
-    "sorgular": lambda y: "turkish" in y and "quer" in y and "train" in y and y.endswith(".tsv"),
-    "koleksiyon": lambda y: "turkish" in y and "collection" in y and y.endswith(".tsv"),
+    "sorgular": lambda y: _tr(y) and "quer" in y and "train" in y and not y.endswith(".parquet"),
+    "koleksiyon": lambda y: _tr(y) and "collection" in y and not y.endswith(".parquet"),
     "ucluler": lambda y: "triples" in y and "ids" in y and "small" in y and y.endswith(".tsv"),
 }
 _liste = None
@@ -38,8 +47,10 @@ def hf_yol(ad):
         _liste = HfApi().list_repo_files(DEPO, repo_type="dataset")
     adaylar = sorted(y for y in _liste if DESENLER[ad](y.lower()))
     if not adaylar:
-        ornek = [y for y in _liste if "turkish" in y.lower()][:20]
-        raise SystemExit(f"{ad} için dosya bulunamadı. Türkçe içeren yollar: {ornek}")
+        print(f"{ad} için dosya bulunamadı. Depodaki tüm dosyalar:", file=sys.stderr)
+        for y in sorted(_liste):
+            print("  ", y, file=sys.stderr)
+        raise SystemExit(1)
     # "google" çevirisi varsa onu tercih et (helsinki'ye göre daha kaliteli)
     adaylar.sort(key=lambda y: ("google" not in y.lower(), y))
     print(f"{ad}: {adaylar[0]}", file=sys.stderr)
