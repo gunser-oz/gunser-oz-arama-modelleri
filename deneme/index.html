@@ -29,6 +29,7 @@
   .sonuclar h3 { margin:0 0 10px; font-size:14px; color:var(--soluk); text-transform:uppercase; letter-spacing:.04em; }
   .sonuc { padding:10px 0; border-top:1px solid var(--cizgi); font-size:14px; line-height:1.45; }
   .sonuc:first-of-type { border-top:none; }
+  .kaynak { font-size:12px; color:var(--vurgu); margin-bottom:4px; }
   .skor { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--soluk); margin-top:6px; }
   .bar { flex:1; height:6px; background:var(--cizgi); border-radius:3px; overflow:hidden; }
   .bar i { display:block; height:100%; background:var(--vurgu); }
@@ -77,7 +78,8 @@ const $ = s => document.querySelector(s);
 const adlar = { temel: "Temel model", ince_ayar: "İnce ayarlı model" };
 
 fetch("/bilgi").then(r => r.json()).then(b => {
-  $("#bilgi").textContent = `${b.modeller.map(m => adlar[m] || m).join(" ve ")} yüklü · ${b.belge_sayisi} belge indekslendi`;
+  const dosya = b.dosya_sayisi ? `${b.dosya_sayisi} dosya, ` : "";
+  $("#bilgi").textContent = `${b.modeller.map(m => adlar[m] || m).join(" ve ")} yüklü · ${dosya}${b.belge_sayisi} parça indekslendi`;
 }).catch(() => $("#bilgi").textContent = "Sunucuya ulaşılamadı. Önce deneme/sunucu.py çalıştırın.");
 
 document.querySelectorAll(".sekmeler button").forEach(b => b.onclick = () => {
@@ -101,7 +103,7 @@ $("#araBtn").onclick = async () => {
   const veri = await istek("/ara", { sorgu, k: +$("#k").value }, $("#araBtn")); if (!veri) return;
   $("#araSonuc").innerHTML = Object.entries(veri).map(([ad, liste]) => `
     <div class="kart"><h3>${adlar[ad] || ad}</h3>
-      ${liste.map(s => `<div class="sonuc">${s.belge}
+      ${liste.map(s => `<div class="sonuc">${s.kaynak ? `<div class="kaynak">${s.kaynak}</div>` : ""}${s.belge}
         <div class="skor"><div class="bar"><i style="width:${Math.max(0,(s.skor-0.6)/0.4*100)}%"></i></div>${s.skor.toFixed(3)}</div></div>`).join("")}
     </div>`).join("");
 };

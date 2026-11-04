@@ -42,6 +42,7 @@ def main():
     p.add_argument("--test-ayir", type=int, default=0, help="Sondan bu kadar satırı hiç kullanma (degerlendir.py için)")
     p.add_argument("--en-fazla", type=int, default=0, help="En fazla bu kadar satırla eğit (0 = hepsi)")
     p.add_argument("--maks-uzunluk", type=int, default=256, help="Token cinsinden en uzun girdi")
+    p.add_argument("--kaydet-adim", type=int, default=200, help="Bu kadar adımda bir ara kayıt (0 = kapalı)")
     a = p.parse_args()
 
     model = SentenceTransformer(a.model)
@@ -71,7 +72,9 @@ def main():
         warmup_steps=0.1,  # oran olarak (transformers v5)
         batch_sampler="no_duplicates",
         eval_strategy="epoch" if dogrulama else "no",
-        save_strategy="no",
+        save_strategy="steps" if a.kaydet_adim else "no",
+        save_steps=a.kaydet_adim or 500,
+        save_total_limit=1,
         logging_steps=10,
         report_to="none",
     )

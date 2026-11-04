@@ -4,10 +4,12 @@ Modeli tarayıcıdan denemek için küçük bir sunucu.
   python deneme/sunucu.py                      # depodaki temel modeli yükler
   python deneme/sunucu.py --model cikti/e5-small-tr/final   # ince ayarlı modeli yükler
   python deneme/sunucu.py --karsilastir cikti/e5-small-tr/final  # ikisini yan yana
+  python deneme/sunucu.py --indeks deneme/indeks   # indeksle.py ile kurulan FAISS indeksini kullanır
 
 Sonra tarayıcıda http://localhost:8000 açın.
 """
 import argparse
+import json
 from pathlib import Path
 
 import uvicorn
@@ -24,20 +26,32 @@ p = argparse.ArgumentParser()
 p.add_argument("--model", default=str(TEMEL_MODEL))
 p.add_argument("--karsilastir", default=None, help="İkinci model (ör. ince ayarlı)")
 p.add_argument("--belgeler", default=str(BURASI / "belgeler.txt"))
+p.add_argument("--indeks", default=None, help="indeksle.py çıktısı; verilirse --belgeler yok sayılır")
 p.add_argument("--port", type=int, default=8000)
 a = p.parse_args()
 
-belgeler = [s.strip() for s in Path(a.belgeler).read_text(encoding="utf-8").splitlines() if s.strip()]
-
-modeller = {"temel": SentenceTransformer(a.model)}
-if a.karsilastir:
-    modeller["ince_ayar"] = SentenceTransformer(a.karsilastir)
-
-# Belgeleri bir kez vektöre çevir, her sorguda yeniden hesaplama
-indeks = {
-    ad: m.encode(["passage: " + b for b in belgeler], normalize_embeddings=True, convert_to_tensor=True)
-    for ad, m in modeller.items()
-}
+if a.indeks:
+    # indeksle.py ile hazırlanmış FAISS indeksi: belgeler ve vektörler diskten gelir
+    import faiss
+    kayitlar = [json.loads(s) for s in open(Path(a.indeks) / "kayitlar.jsonl", encoding="utf-8")]
+    belgeler = [k["metin"] for k in kayitlar]
+    kaynaklar = [k["dosya"] for k in kayitlar]
+    bilgi = json.loads((Path(a.indeks) / "bilgi.json").read_text(encoding="utf-8"))
+    modeller = {"temel": SentenceTransformer(bilgi["model"])}
+    faiss_indeks = faiss.read_index(str(Path(a.indeks) / "vektorler.faiss"))
+    indeks = None
+else:
+    belgeler = [s.strip() for s in Path(a.belgeler).read_text(encoding="utf-8").splitlines() if s.strip()]
+    kaynaklar = [None] * len(belgeler)
+    modeller = {"temel": SentenceTransformer(a.model)}
+    if a.karsilastir:
+        modeller["ince_ayar"] = SentenceTransformer(a.karsilastir)
+    # Belgeleri bir kez vektöre çevir, her sorguda yeniden hesaplama
+    indeks = {
+        ad: m.encode(["passage: " + b for b in belgeler], normalize_embeddings=True, convert_to_tensor=True)
+        for ad, m in modeller.items()
+    }
+    faiss_indeks = None
 
 app = FastAPI()
 
@@ -59,17 +73,23 @@ def sayfa():
 
 @app.get("/bilgi")
 def bilgi():
-    return {"modeller": list(modeller), "belge_sayisi": len(belgeler)}
+    return {"modeller": list(modeller), "belge_sayisi": len(belgeler),
+            "dosya_sayisi": len(set(kaynaklar)) if a.indeks else None}
 
 
 @app.post("/ara")
 def ara(s: Sorgu):
     cikti = {}
     for ad, m in modeller.items():
-        q = m.encode("query: " + s.sorgu, normalize_embeddings=True, convert_to_tensor=True)
-        skorlar = (indeks[ad] @ q).tolist()
-        sirali = sorted(range(len(belgeler)), key=lambda i: -skorlar[i])[: s.k]
-        cikti[ad] = [{"belge": belgeler[i], "skor": round(skorlar[i], 4)} for i in sirali]
+        if faiss_indeks is not None:
+            q = m.encode(["query: " + s.sorgu], normalize_embeddings=True)
+            skor, idx = faiss_indeks.search(q.astype("float32"), s.k)
+            ciftler = [(int(i), float(sk)) for i, sk in zip(idx[0], skor[0]) if i >= 0]
+        else:
+            q = m.encode("query: " + s.sorgu, normalize_embeddings=True, convert_to_tensor=True)
+            skorlar = (indeks[ad] @ q).tolist()
+            ciftler = [(i, skorlar[i]) for i in sorted(range(len(belgeler)), key=lambda i: -skorlar[i])[: s.k]]
+        cikti[ad] = [{"belge": belgeler[i], "skor": round(sk, 4), "kaynak": kaynaklar[i]} for i, sk in ciftler]
     return cikti
 
 
