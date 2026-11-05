@@ -30,7 +30,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git lfs install --local
-          git lfs track "*.onnx" "*.wasm" "*.f16" "lib/*.js" "lib/*.mjs" "veri/*.json" >/dev/null
+          git lfs track "*.onnx" "*.wasm" "*.f16" "lib/*.js" "lib/*.mjs" "veri/*.json" "model/*.json" >/dev/null
           git add -A
           git commit -q -m "Space yayını: $GITHUB_SHA"
           git push -f "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" main
