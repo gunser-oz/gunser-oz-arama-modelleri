@@ -5,7 +5,7 @@
   "clean_up_tokenization_spaces": true,
   "cls_token": "<s>",
   "eos_token": "</s>",
-  "is_local": true,
+  "is_local": false,
   "local_files_only": false,
   "mask_token": "<mask>",
   "model_max_length": 192,

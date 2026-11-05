@@ -5,74 +5,95 @@ tags:
 - feature-extraction
 - dense
 - generated_from_trainer
-- dataset_size:9800
+- dataset_size:94050
 - loss:MultipleNegativesRankingLoss
+base_model: intfloat/multilingual-e5-small
 widget:
-- source_sentence: 'query: bir llc için bir işletme sözleşmesi nedir'
+- source_sentence: 'query: +bir fırtına açıklaması nedir'
   sentences:
-  - 'passage: LLC İşletim Anlaşması. ''LLC İşletim Anlaşması'' nın DEFINITION''. Bir
-    LLC İşletim Anlaşması, bir Sınırlı Sorumluluk Şirketi''nin (LLC) şartlarını sahiplerinin
-    özel ihtiyaçlarına göre özelleştiren ve finansal ve işlevsel karar vermeyi yapılandırılmış
-    bir şekilde ana hatlarıyla belirleyen bir belgedir.'
-  - 'passage: Gri kurt (Canis lupus, evcil köpek ve dingo hariç), aynı zamanda kurt
-    olarak da bilinir, Canidae ailesinin en büyük mevcut vahşi üyesidir.'
-  - 'passage: .'
-- source_sentence: 'query: Akran baskısı ne yapar'
+  - 'passage: Açıklama: Mülkiyeti adres veya yasal olarak açıkça tanımlayın. açıklama.
+    B. Gerçek Mülkiyet Alınacak. Bu, satın alma amaçlı mülkün tanımıdır. Ayrıca, değerlendiricinin
+    parsel numarası için de bir alan vardır. C. Satın Alma Fiyatı: Bu, alıcının satıcıya
+    ödeme yapmayı teklif ettiği fiyattır.'
+  - 'passage: Anthony Webb; görüntü kredisi www.giantbomb.com. Anthony Webb, basketboldaki
+    mükemmelliğini gösterebilen NBA''deki en kısa oyuncu. NBA''de toplam 814 maç oynadı.
+    Anthony Webb, yüksek boyunun ötesine geçen yüksek spritüel bir adamdı.'
+  - 'passage: Bir gök gürültülü fırtına yıldırım ve gök gürültüsü ile bir fırtınadır.
+    Sıcak, nemli hava dikey olarak atmosfere yükseldiğinde ortaya çıkan bir hava akımından
+    kaynaklanırlar. Yükseltme, sonunda fırtına bulutu olacak bir kümülüs bulutu oluşturur.'
+- source_sentence: 'query: armenia para birimi nedir'
   sentences:
-  - 'passage: Zararlı akran baskısı ne anlama gelir? sigara içmek, kokain yapmak veya
-    içmek ve orada birini ölüme yol açabilecek güzel şeyleri ikna etmek gibi bir başkasına
-    zarar verebilecek akran baskısı Edit'
-  - 'passage: Akran baskısı, başkalarını tutumlarını, değerlerini veya davranışlarını
-    gruplara uymaya teşvik eden bir akran grubu, gözlemci veya birey üzerinde etkilidir.'
-  - 'passage: Paraguay, Güney Amerika''daki gizli mücevherlerden biridir ve en ünlüsü
-    Guarani kültürüne ve İsa''nın (resimde) ve Trinidad''ın dini kalıntılarına ev
-    sahipliği yapmasıyla bilinir.'
-- source_sentence: 'query: katot negatif'
+  - 'passage: Para transferi döviz kuru, bir ülkenin para biriminin başka bir ülkede
+    değiştirilebileceği miktardır. Başka bir deyişle, belirli bir miktarda farklı
+    bir para birimi kullanılarak satın alınabilen bir para biriminin miktarıdır.'
+  - 'passage: AMD-Armenian Dram. Armenia, Dram. Ermeni Dram Ermenistan para birimidir.
+    Döviz sıralamalarımız en popüler Ermenistan Dram döviz kurunun AMD''den USD''ye
+    olduğunu göstermektedir. Dramlar için para kodu AMD''dir ve para birimi sembolüdür.
+    Aşağıda Ermeni Dram oranları ve bir döviz dönüştürücü bulacaksınız. Ayrıca günlük
+    oranlar ve analiz ile döviz bültenlerimize abone olabilir, XE Para Birimi Blogunu
+    okuyabilir veya AMD para birimini alabilirsiniz.'
+  - 'passage: Badem sütü hakkında çok şey duyuyorsanız ve denemek isteyebileceğiniz
+    bir şey olup olmadığını bilmek istiyorsanız, badem sütünün sizin için sağlıklı
+    olabileceği 17 yolu okumaya devam edin. 1) Badem sütünüzü kendiniz yapabilir ve
+    paradan tasarruf edebilirsiniz. Badem sütü nefret edenlerin en büyük şikayetlerinden
+    biri badem ve sudan oluşmasıdır.'
+- source_sentence: 'query: Wallerstein''ın dünya sistemleri teorisi nedir'
   sentences:
-  - 'passage: Avelox dozu, her 24 saatte bir 400 mg''dır (ya da intravenöz infüzyon
-    olarak). Terapi süresi, Tablo 1''de açıklandığı gibi enfeksiyonun türüne bağlıdır.
-    Tablo 1: Yetişkin Hastalarda Dozaj ve Terapinin Süresi.'
-  - 'passage: 1 Katot negatif yüklü elektrottur. 2 Katot, katyonları veya pozitif
-    yükü çeker. 3 Katot elektronların veya elektron vericisinin kaynağıdır. 4 Pozitif
-    yükü kabul edebilir.'
-  - 'passage: Sir Joseph John Thomson, bir İngiliz fizikçi, 1897 yılında elektronu
-    keşfetti. Katot tüplerinde elektrik deşarjı üzerinde yapılan deneylerde, yük oranı
-    için yüksek bir değere dikkat çekti. Onun...'
-- source_sentence: 'query: yoğunluk için eş anlamlılar'
+  - 'passage: Dünya Sistemler Teorisi. Sosyolog Immanuel Wallerstein tarafından geliştirilen
+    dünya sistem teorisi, bazı ülkelerin yararlandığı bir dünya ekonomik sistemi olduğunu
+    öne süren dünya tarihine ve sosyal değişime bir yaklaşımdır.'
+  - 'passage: Pratik, işlevsel ve inkar edilemez bir şekilde uygun maliyetli olan
+    beyaz kalıplı kapılarımız, çoğu iç dekor dekoru tamamlamak için uygun hale getiren
+    temiz, basit çizgileriyle tanımlanır. 4 dokulu kalıplı modellerin tümü, fabrikada
+    önceden tedarik edilir. bir dizi eski stok. boyutlar.'
+  - 'passage: Sosyolojik Teori Kısaca Sosyolojik teori, sosyal dünyanın bilgisinin
+    sistemleştirilmesine olanak tanıyan birbiriyle ilişkili bir dizi fikir olarak
+    tanımlanır. Bu bilgi daha sonra sosyal dünyayı açıklamak ve sosyal dünyanın geleceği
+    hakkında tahminlerde bulunmak için kullanılır.'
+- source_sentence: 'query: normal kan olarak kabul edilen'
   sentences:
-  - 'passage: Princeton WordNet(4.00 / 2 oy)Bu eşanlamlıları derecelendirin: 1 yoğunluk,
-    yoğunluk(noun) birim büyüklüğü başına miktar. 2 konsantrasyon, yoğunluk, yoğunluk,
-    sıkılık, kompaktlık(noun) birlikte kalabalık olmanın mekansal özelliği.'
-  - 'passage: Mahamrityunjaya Mantra Hint Mitolojisi ve Maneviyat en iyi Mantra biri
-    Lord Shiva aittir.Üç Hintçe dil kelimelerinin bir kombinasyonudur.yani Maha Büyük
-    anlamına gelir, Mrityun Ölüm anlamına gelir ve Jaya zafere dönüşen veya ölüm üzerinde
-    zafer anlamına gelir.'
-  - 'passage: Bir çaba eşanlamlıları yapın. Üst bir çaba eşanlamlıları yapmak (sadece
-    idioms) bir çatlak var, çip uzakta ve bir gitmek vermek.'
-- source_sentence: 'query: dramaturjik sosyoloji tanımı'
+  - 'passage: Sık sık kabızlık veya diğer bağırsak sorunları ile ilgili sorun varsa,
+    psyllium tozu yararlı olabilir. Sarı psyllium tohumlarının kabuğundan topraklanır
+    ve bağırsak hareketlerindeki bozulmaları hafifletmek için ek lif olarak kullanılır.Modern
+    diyette genellikle eksik olan Fiber, vücuttan metabolik atıkların giderilmesine
+    yardımcı olur.t''nin tabanı, sarışın psyllium tohumlarının kabuğundan ve modern
+    diyetteki bozulmaları hafifletmek için ek lif olarak kullanılır, genellikle Fiber
+    eksikliğinden kurtulur.'
+  - 'passage: Normal kan basıncı. Yetişkinler için normal kan basıncı 120 mmHg''nin
+    altında sistolik basınç ve 80 mmHg''nin altında diyastolik basınç olarak tanımlanır.
+    Uyurken, uyandığında veya heyecanlandığında veya gergin olduğunda kan basıncının
+    değişmesi normaldir. Aktif olduğunuzda, kan basıncınızın artması normaldir.'
+  - 'passage: Kan Basıncı Aralıkları Çizelgesi. Yaşlandıkça, kan damarlarınız daha
+    sert hale gelir ve sistolik basıncınızın (en yüksek sayı) artması nadir değildir.
+    120/80''lik bir okuma normal kabul edilse de, 40 yaşın üzerindeki biri 140/90''lık
+    bir okumaya sahip olabilir ve mükemmel kabul edilebilir olarak kabul edilebilir.
+    Kan Basıncı Aralıkları Çizelgesi. Yaşlandıkça, kan damarlarınız daha sert hale
+    gelebilir ve sitolik basıncınız için nadir değildir.'
+- source_sentence: 'query: burun septum sapması nedir'
   sentences:
-  - 'passage: dramaturjik. Drama veya tiyatro ile ilgili veya: dramatik, dramaturjik,
-    histrionik, histriyonik, teatral, tiyatro, tespih.'
-  - 'passage: wikipedia/Cburnett. San Diego Hayvanat Bahçesi, 800''den fazla türden
-    4.000''den fazla hayvanla dünyanın en ünlü hayvanat bahçelerinden biridir. 100
-    dönümlük (40 ha) park alanı San Diego şehrinden kiralanmıştır.'
-  - 'passage: Kırsal sosyoloji, tersine, metropol olmayan alanların analizidir. Tarım
-    ve vahşi yaşam kırsal bölgelerde daha belirgin bir sosyal gerçek olma eğiliminde
-    olduğundan, kırsal sosyologlar genellikle çevre sosyologları ile örtüşmektedir.
-    Toplum sosyolojisi'
+  - 'passage: Nazal septum sapması veya sapmış nazal septum (DNS) [1] burunun fiziksel
+    bir bozukluğudur, burun septumun yer değiştirmesini içerir. Bazı yer değiştirmeler
+    yaygındır, insanların %80''ini etkiler, çoğu bilmeden. [2]'
+  - 'passage: CostHelper okuyucuları, tek bir protez plakasına sahip implantlar için
+    ortalama 14,226 $; ve implant destekli protezlerin (üst ve alt) tam bir seti için
+    6,549-80.000 $ ''lık ortalama bir maliyetle 34,119 $'' ödediklerini bildirdi.'
+  - 'passage: İnfraorbital sinir, üç ana deri altı dalına yol açar: alt göz kapağının
+    derisini sağlayan palpebral dallar; burnun yan kısmının derisini ve burun septumun
+    hareketli kısmının derisini sağlayan burun dalları; ve yanak ve üst dudağın ön
+    kısmının derisini sağlayan üstün labial dallar. 36,38'
 pipeline_tag: sentence-similarity
 library_name: sentence-transformers
 ---
 
-# SentenceTransformer
+# SentenceTransformer based on intfloat/multilingual-e5-small
 
-This is a [sentence-transformers](https://www.SBERT.net) model trained on the json dataset. It maps inputs to a 384-dimensional dense vector space and can be used for semantic textual similarity, semantic search, paraphrase mining, classification, clustering, and more.
+This is a [sentence-transformers](https://www.SBERT.net) model finetuned from [intfloat/multilingual-e5-small](https://huggingface.co/intfloat/multilingual-e5-small) on the json dataset. It maps sentences & paragraphs to a 384-dimensional dense vector space and can be used for semantic textual similarity, semantic search, paraphrase mining, classification, clustering, and more.
 
 ## Model Details
 
 ### Model Description
 - **Model Type:** Sentence Transformer
-<!-- - **Base model:** [Unknown](https://huggingface.co/unknown) -->
+- **Base model:** [intfloat/multilingual-e5-small](https://huggingface.co/intfloat/multilingual-e5-small) <!-- at revision 614241f622f53c4eeff9890bdc4f31cfecc418b3 -->
 - **Maximum Sequence Length:** 192 tokens
 - **Output Dimensionality:** 384 dimensions
 - **Similarity Function:** Cosine Similarity
@@ -94,7 +115,7 @@ This is a [sentence-transformers](https://www.SBERT.net) model trained on the js
 SentenceTransformer(
   (0): Transformer({'transformer_task': 'feature-extraction', 'modality_config': {'text': {'method': 'forward', 'method_output_name': 'last_hidden_state'}}, 'module_output_name': 'token_embeddings', 'architecture': 'BertModel'})
   (1): Pooling({'embedding_dimension': 384, 'pooling_mode': 'mean', 'include_prompt': True})
-  (2): Normalize({'module_input_name': 'sentence_embedding', 'module_output_name': 'sentence_embedding'})
+  (2): Normalize({})
 )
 ```
 
@@ -115,9 +136,9 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer("sentence_transformers_model_id")
 # Run inference
 sentences = [
-    'query: dramaturjik sosyoloji tanımı',
-    'passage: dramaturjik. Drama veya tiyatro ile ilgili veya: dramatik, dramaturjik, histrionik, histriyonik, teatral, tiyatro, tespih.',
-    'passage: Kırsal sosyoloji, tersine, metropol olmayan alanların analizidir. Tarım ve vahşi yaşam kırsal bölgelerde daha belirgin bir sosyal gerçek olma eğiliminde olduğundan, kırsal sosyologlar genellikle çevre sosyologları ile örtüşmektedir. Toplum sosyolojisi',
+    'query: burun septum sapması nedir',
+    "passage: Nazal septum sapması veya sapmış nazal septum (DNS) [1] burunun fiziksel bir bozukluğudur, burun septumun yer değiştirmesini içerir. Bazı yer değiştirmeler yaygındır, insanların %80'ini etkiler, çoğu bilmeden. [2]",
+    'passage: İnfraorbital sinir, üç ana deri altı dalına yol açar: alt göz kapağının derisini sağlayan palpebral dallar; burnun yan kısmının derisini ve burun septumun hareketli kısmının derisini sağlayan burun dalları; ve yanak ve üst dudağın ön kısmının derisini sağlayan üstün labial dallar. 36,38',
 ]
 embeddings = model.encode(sentences)
 print(embeddings.shape)
@@ -126,9 +147,9 @@ print(embeddings.shape)
 # Get the similarity scores for the embeddings
 similarities = model.similarity(embeddings, embeddings)
 print(similarities)
-# tensor([[1.0000, 0.6866, 0.5855],
-#         [0.6866, 1.0000, 0.3722],
-#         [0.5855, 0.3722, 1.0000]])
+# tensor([[1.0000, 0.7621, 0.5467],
+#         [0.7621, 1.0000, 0.5657],
+#         [0.5467, 0.5657, 1.0000]])
 ```
 <!--
 ### Direct Usage (Transformers)
@@ -173,20 +194,20 @@ You can finetune this model on your own dataset.
 #### json
 
 * Dataset: json
-* Size: 9,800 training samples
+* Size: 94,050 training samples
 * Columns: <code>anchor</code>, <code>positive</code>, and <code>negative</code>
 * Approximate statistics based on the first 100 samples:
-  |          | anchor                                                                            | positive                                                                            | negative                                                                            |
-  |:---------|:----------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
-  | type     | string                                                                            | string                                                                              | string                                                                              |
-  | modality | text                                                                              | text                                                                                | text                                                                                |
-  | details  | <ul><li>min: 8 tokens</li><li>mean: 13.42 tokens</li><li>max: 23 tokens</li></ul> | <ul><li>min: 35 tokens</li><li>mean: 79.71 tokens</li><li>max: 134 tokens</li></ul> | <ul><li>min: 27 tokens</li><li>mean: 80.36 tokens</li><li>max: 141 tokens</li></ul> |
+  |          | anchor                                                                           | positive                                                                            | negative                                                                            |
+  |:---------|:---------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
+  | type     | string                                                                           | string                                                                              | string                                                                              |
+  | modality | text                                                                             | text                                                                                | text                                                                                |
+  | details  | <ul><li>min: 8 tokens</li><li>mean: 13.8 tokens</li><li>max: 40 tokens</li></ul> | <ul><li>min: 29 tokens</li><li>mean: 84.59 tokens</li><li>max: 146 tokens</li></ul> | <ul><li>min: 30 tokens</li><li>mean: 79.38 tokens</li><li>max: 136 tokens</li></ul> |
 * Samples:
-  | anchor                                                               | positive                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | negative                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-  |:---------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  | <code>query: Bir nöronun dinlenme anındaki elektriksel durumu</code> | <code>passage: Nöron dinlendiğinde, sodyum iyonlarının hücreden dışarı taşınmasından ne sorumludur? Sodyum-potasyum pompası Bir nöronun zarı dinlendiğinde, konsantrasyon gradyanı sodyumu hareket ettirme eğilimindedir. Hücre ve elektrik gradyanı hücreyi hareket ettirme eğilimindedir.</code>                                                                                                                                                                                                                | <code>passage: Sinirsel impulslar, nöronlar boyunca hareket eden elektriksel sinyallerdir. Elektrik sinyalleri bir nörondan diğerine doğrudan gidemez. Sinyal, sinaps adı verilen, kimyasal formda hücreler arasındaki boşluğu geçer. Bir nöron, bir eylem potansiyeline (sinir impuls) yanıt olarak kimyasalları serbest bırakır. Bu kimyasallar, bir sonraki nörondaki bir etki potansiyelini uyarır ve bir sonraki nörondaki bir etki potansiyelini uyarır. Bu kimyasallar nörotransmitter olarak bilinir. Sinyal, bir sinaps olarak adlandırılan hücreler arasındaki boşluğu geçer.</code> |
-  | <code>query: Araçta pas delikleri nasıl onarılır</code>              | <code>passage: Tamir edilecek olan deliğin çevresinden katı olmayan herhangi bir metali çıkarın. Delikten uzak tüm yönlerde 3 ila 4 inçlik bir mesafe boyunca herhangi bir boya ve astarı çıkarmak için kaba gri zımpara kağıdı kullanın. En iyi ve en uzun ömürlü onarım için, tüm paslar da kaldırılmalıdır. Bununla birlikte, bazı küçük pas çukurlarının kalabileceği muhtemeldir. Deliğin arkasında dolgu yapmak için naylon pencere ekranı kullanın ve otodan bir arka gövde oluşturun.</code>              | <code>passage: Onarımları karşılayacak araba sigortanız olsa bile, çoğu poliçe, onarımların geri kalanını ödemeden önce bir indirim ödemenizi gerektirir. Bir araba tamir kredisi, ödemek için yeterli nakit paranız yoksa, indirimi karşılamak için kullanılabilir. Araba tamir kredisi, bir araca yatırım yapıldığından, kişisel krediden farklıdır. Genellikle bakım onarım kredileri, aracı çalışır durumda tutan ancak bazı araba tamir tiplerinde onarımlar için olmalıdır.</code>                                                                                                       |
-  | <code>query: habitat ve adaptasyon sincaplarının tanımı</code>       | <code>passage: Adaptasyon. Bir sincap yaşam tarzına son derece yararlı olan bir adaptasyon, arka bacaklarının anatomisidir. Sincaplar, önce bir ağaç kafasının aşağı inmesine izin veren arka ayaklarını döndürebilirler. Bu, predasyondan kaçınmanın yanı sıra, ağaçtan ağaca ulaşmak ve seyahat etmek için yararlıdır. daptasyon. Bir sincapın yaşam tarzına son derece faydalı olan bir adaptasyon, arka ayaklarının anatomisidir. Sincaplar, ilk olarak arka ayaklarının aşağısına dönmelerini sağlar.</code> | <code>passage: Bir uyarlama, mevcut işlevi için doğal seçilim tarafından üretilen bir özelliktir. Bu tanıma dayanarak belirli tahminler yapabiliriz (X belirli bir fonksiyon için bir uyarlama ise, o zaman bunu tahmin ederiz...) ve tahminlerimizin gözlemlerimizle uyuşup uyuşmadığını göreceğiz. Örnek olarak, hipotezi ele alacağız: tüyler kuş uçuşu için bir uyarlamadır.</code>                                                                                                                                                                                                        |
+  | anchor                                                  | positive                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | negative                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+  |:--------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | <code>query: Hangi başkan Cleveland'da gömülü oh</code> | <code>passage: Galeri: James A. Garfield Memorial, Greater Cleveland'ın tek başkanını onurlandırdı. CLEVELAND, Ohio - Lake View Mezarlığı arazisinin 180 feet üzerinde yükselen James A. Garfield Memorial, 20. başkanı ve Cuyahoga County'den tek kişiyi onurlandırdı. Garfield, 1831'de şimdi Moreland Hills olan yerde doğan logaritmik kabin başkanlarının sonuncusuydu. Daha sonra Hiram olarak adlandırılan Western Reserve Eclectic Enstitüsü'nü yönetti.</code>                                                                                                                               | <code>passage: Cleveland OH (CLE) ve Las Vegas NV (LAS) arasındaki uçuş mesafesi 1824 mildir. Havadaki zaman yaklaşık 4 saat 19 dakika ve rampa süresine rampa kabaca 4 saat 39 dakikadır. Cleveland'dan Las Vegas'a doğrudan uçuşlar hakkında bu bilgiyi umuyoruz. Bu seyahat uçuş rehberi, Las Vegas'tan doğrudan uçuşlar ve Cleveland havaalanından ucuz uçuşlar arayanları ilgilendirir. Cleveland OH'dan Las Vegas'a uçuşları da bulabilir.</code> |
+  | <code>query: Tahliye bildiriminden kaç gün sonra</code> | <code>passage: 14 günlük bir bildirimle veya tedavi hakkı olan 5 günlük bildirimin sona ermesinden sonra, ev sahibi kiranızı reddedebilir ve tahliye davası açabilir. 3/1/12 tarihinden itibaren, bildirimin süresi dolduğunda, ev sahibi kirayı tam olarak ödeseniz bile sizi tahliye edebilir. (Wis. Stat.</code>                                                                                                                                                                                                                                                                                   | <code>passage: Minnesota Eviction Laws. Minnesota Eviction Process'in ilk adımı, kiracıya bir Minnesota Eviction Notu veren ev sahibidir ve kiracının bildirimdeki talebe uymaması durumunda bir Eviction Action'da dava edileceğini söyler.</code>                                                                                                                                                                                                     |
+  | <code>query: beslenme ve diyetetik maaş</code>          | <code>passage: Beslenme ve diyetetik işleri için ortalama maaş 36,000 $ 'dır. Ortalama beslenme ve diyetetik maaşları şirket, konum, endüstri, deneyim ve faydalar nedeniyle büyük ölçüde değişebilir. Bu maaş, iş listesinde herhangi bir yerde beslenme ve diyetetik terimi ile tüm işler için ortalama maaş kullanılarak hesaplanmıştır. Beslenme ve diyetetik maaş karşılaştırmaları özelliği, iş arayanların önemli kariyer kararları almak ve maaş aralıklarını müzakere etmek için gereken bilgileri almalarını sağlar. Ek beslenme ve diyetetik maaşları için maaşları tavsiye ederiz.</code> | <code>passage: Ülkemiz her Temmuz Beslenme Ayı'nı kutluyor ve Eğitim Bakanlığı (DepEd), tüm okullara sağlık ve beslenmenin önemini artıracak faaliyetlere katılarak Beslenme Ayı kutlamalarına katılmalarını tavsiye ediyor.</code>                                                                                                                                                                                                                     |
 * Loss: [<code>MultipleNegativesRankingLoss</code>](https://sbert.net/docs/package_reference/sentence_transformer/losses.html#multiplenegativesrankingloss) with these parameters:
   ```json
   {
@@ -207,20 +228,20 @@ You can finetune this model on your own dataset.
 #### json
 
 * Dataset: json
-* Size: 200 evaluation samples
+* Size: 950 evaluation samples
 * Columns: <code>anchor</code>, <code>positive</code>, and <code>negative</code>
 * Approximate statistics based on the first 100 samples:
-  |          | anchor                                                                            | positive                                                                            | negative                                                                           |
-  |:---------|:----------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------|
-  | type     | string                                                                            | string                                                                              | string                                                                             |
-  | modality | text                                                                              | text                                                                                | text                                                                               |
-  | details  | <ul><li>min: 7 tokens</li><li>mean: 13.22 tokens</li><li>max: 23 tokens</li></ul> | <ul><li>min: 35 tokens</li><li>mean: 80.57 tokens</li><li>max: 138 tokens</li></ul> | <ul><li>min: 6 tokens</li><li>mean: 81.34 tokens</li><li>max: 126 tokens</li></ul> |
+  |          | anchor                                                                            | positive                                                                            | negative                                                                            |
+  |:---------|:----------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
+  | type     | string                                                                            | string                                                                              | string                                                                              |
+  | modality | text                                                                              | text                                                                                | text                                                                                |
+  | details  | <ul><li>min: 8 tokens</li><li>mean: 13.64 tokens</li><li>max: 26 tokens</li></ul> | <ul><li>min: 27 tokens</li><li>mean: 88.57 tokens</li><li>max: 141 tokens</li></ul> | <ul><li>min: 29 tokens</li><li>mean: 82.82 tokens</li><li>max: 148 tokens</li></ul> |
 * Samples:
-  | anchor                                                                                                        | positive                                                                                                                                                                                                                                                                                                                                                                                                                                                           | negative                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-  |:--------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  | <code>query: Minyatür inek türleri</code>                                                                     | <code>passage: Minyatür sığırlar kalça yüksekliği ile ölçülen üç kategoride sınıflandırılır. Bu üç kategori (1) orta boy minyatür, 42 ila 48 inç; (2) standart minyatür, 36 ila 42 inç; ve (3) mikro minyatür, 36 inç ve altı. Küçük cins sığırlar 500 ila 800 pound arasında değişir. Genel olarak, minyatür süt inekleri standart süt ineklerinin üçte biri ila yarısı büyüklüğündedir. 42 ila 44 inç boyunda küçük bir ailenin en ideal olduğunu buldum.</code> | <code>passage: Caribou, her iki cinsin de boynuzları olan tek geyik türüdür. Olgun boğalar muazzam ve karmaşık boynuzlar taşıyabilirken, inekler ve genç hayvanlar genellikle daha küçük ve daha basit boynuzlara sahiptir. Olgun boğalar genellikle boynuzlarını ruttan kısa bir süre sonra dökerler, oysa inekler ilkbahara kadar boynuzlarını tutabilirler.</code>                                                                                                                 |
-  | <code>query: Kelimelerin bireysel konuşma seslerinden oluştuğunu fark etme yeteneğini tanımlayan terim</code> | <code>passage: Kelimelerin bireysel konuşma seslerinin birleşiminden oluştuğunu anlama bilgi ve yeteneği. Fonikler 44 İngilizce konuşma sesini sembolize etmek için kullanılan 26 harften oluşan bir bilgi gövdesi.</code>                                                                                                                                                                                                                                         | <code>passage: Eski Çince'nin kavramsal bir dil olduğunu söylediğimizde, sadece konuşulan bir dilin seslerini temsil etmediğini değil, aynı zamanda konuşulan bir dilde kullandığımız konuşma bölümlerini bile temsil etmediğini kastediyoruz. Eski Çince'nin kavramsal bir dil olduğunu söylediğimizde, sadece konuşulan bir dilin seslerini temsil etmediğini değil, aynı zamanda konuşulan bir dilde kullandığımız konuşma bölümlerini bile temsil etmediğini kastediyoruz.</code> |
-  | <code>query: getcomponent fonksiyonu nedir</code>                                                             | <code>passage: GetComponent() MonoBehaviour sınıfından diğer bileşenlerdeki verilere erişmek için kullanılan bir Unity yöntemidir. Bu yöntemin nasıl çalıştığını tam olarak anlamak için kafanızı birkaç farklı kavram etrafında sarmanız gerekir.</code>                                                                                                                                                                                                          | <code>passage: Etki alanı ve aralık. Bir fonksiyonun etki alanı, fonksiyona (yani x'in alabileceği tüm değerler) koymanıza izin verilen değerler kümesidir. Fonksiyonun aralığı, fonksiyonun alabileceği tüm değerlerin kümesidir, başka bir deyişle y = f(x) olduğunda y'nin olası değerlerinin tümüdir.</code>                                                                                                                                                                      |
+  | anchor                                                            | positive                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | negative                                                                                                                                                                                                                                                                                                                                          |
+  |:------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | <code>query: Gül yaprağında siyah kenarlara neden olan şey</code> | <code>passage: Alice Aks - CA, Zone 9. Yukarıdakilerin hepsini okuduktan sonra, sıcaklık değişimlerinden bahsedecektim. Burada daha soğuk iklimimde, üzerlerine siyah kenar olan bazı kırmızı gül yaprakları alıyorum. Çoğu zaman, bazı soğuk akşamlarda güllerin üzerine çıkan hafif bir dondan kaynaklanmaktadır. Yaprakların kenarları don ısırır ve siyah görünür ve biraz şekil değiştirir. Bir don ve zamanlama siyah kenarların daha fazla olmasına neden olabilir.</code> | <code>passage: Kenarlarda katlayın. Kapağınızı yapmaya başlamak için kitabınızın ön veya arka kapağını seçin. İlk olarak, kağıdınızın uzun kenarlarını kitabın kapağının üzerine katlayın, böylece makul derecede sıkı otururlar. Ardından, kağıdın dört köşesini katlayın, böylece yeni yaptığınız kıvrımların kenarlarıyla hizalanırlar.</code> |
+  | <code>query: Mouse Bilgisayarı Açabilir</code>                    | <code>passage: Cevap olarak: KB/Mouse kullanarak açmak. Klavyeyi kullanarak pc'nizi kapatabilir veya uyku veya kış uykusu moduna sokabilirsiniz, ancak klavyenizle açamazsınız. Güç düğmesine basana kadar klavyeye güç olmadığı için: daha sonra BIOS klavyeyi başlatır ve bir klavye sürücüsü yükler. Uzaktan kumandayı değiştirmek veya çalıştırmak için bir tuşla klavye veya fareyi çalıştırabilirsiniz.</code>                                                              | <code>passage: Optik Fare ve Lazer Fare, bilgisayarda kullanılan iki farklı fare türüdür. Orijinal fare, farenin içindeki küçük bir tekere bağlanacak ağır bir kauçuk top ile güçlendirildi. Kullanıcı fareyi top üzerinde hareket ettirir ve trackball ekrandaki hareketi yansıtırdı.</code>                                                     |
+  | <code>query: Adı Soyadı : Lennox</code>                           | <code>passage: Lennox /len-nox/ [2 hece.] bir erkek ismi olarak LEN-iks telaffuz edilir. İskoç ve Galce kökenlidir ve Lennox'un anlamı birçok karaağaç ile birliktedir.16. yüzyılda İskoçya'da etkili bir aristokrat toprak sahibi ailenin adı.Bir İskoç asilzade olan Lennnnox, Shakespeare'in Macbeth.hown'daki bebek adıdır.</code>                                                                                                                                            | <code>passage: Hypernyms (orijin ülkesi bir tür...): ülke; toprak; devlet (bir ulus tarafından işgal edilen bölge) Hyponyms (aşağıdakilerin her biri bir tür menşe ülkesidir): eski ülke (bir göçmenin menşe ülkesi)</code>                                                                                                                       |
 * Loss: [<code>MultipleNegativesRankingLoss</code>](https://sbert.net/docs/package_reference/sentence_transformer/losses.html#multiplenegativesrankingloss) with these parameters:
   ```json
   {
@@ -239,16 +260,17 @@ You can finetune this model on your own dataset.
 ### Training Hyperparameters
 #### Non-Default Hyperparameters
 
-- `per_device_train_batch_size`: 16
+- `per_device_train_batch_size`: 64
 - `num_train_epochs`: 1.0
 - `learning_rate`: 2e-05
 - `warmup_steps`: 0.1
+- `fp16`: True
 - `batch_sampler`: no_duplicates
 
 #### All Hyperparameters
 <details><summary>Click to expand</summary>
 
-- `per_device_train_batch_size`: 16
+- `per_device_train_batch_size`: 64
 - `num_train_epochs`: 1.0
 - `max_steps`: -1
 - `learning_rate`: 2e-05
@@ -267,7 +289,7 @@ You can finetune this model on your own dataset.
 - `max_grad_norm`: 1.0
 - `label_smoothing_factor`: 0.0
 - `bf16`: False
-- `fp16`: False
+- `fp16`: True
 - `bf16_full_eval`: False
 - `fp16_full_eval`: False
 - `tf32`: None
@@ -353,39 +375,172 @@ You can finetune this model on your own dataset.
 </details>
 
 ### Training Logs
+<details><summary>Click to expand</summary>
+
 | Epoch  | Step | Training Loss | Validation Loss |
 |:------:|:----:|:-------------:|:---------------:|
-| 0.7504 | 460  | 0.2173        | -               |
-| 0.7667 | 470  | 0.2560        | -               |
-| 0.7830 | 480  | 0.1359        | -               |
-| 0.7993 | 490  | 0.1038        | -               |
-| 0.8157 | 500  | 0.1592        | -               |
-| 0.8320 | 510  | 0.2808        | -               |
-| 0.8483 | 520  | 0.2331        | -               |
-| 0.8646 | 530  | 0.1450        | -               |
-| 0.8809 | 540  | 0.2115        | -               |
-| 0.8972 | 550  | 0.2300        | -               |
-| 0.9135 | 560  | 0.1599        | -               |
-| 0.9299 | 570  | 0.2240        | -               |
-| 0.9462 | 580  | 0.1429        | -               |
-| 0.9625 | 590  | 0.2330        | -               |
-| 0.9788 | 600  | 0.2691        | -               |
-| 0.9951 | 610  | 0.2034        | -               |
-| 1.0    | 613  | -             | 0.2266          |
+| 0.0068 | 10   | 1.1463        | -               |
+| 0.0136 | 20   | 1.1058        | -               |
+| 0.0204 | 30   | 0.7209        | -               |
+| 0.0272 | 40   | 0.5759        | -               |
+| 0.0340 | 50   | 0.4503        | -               |
+| 0.0408 | 60   | 0.3543        | -               |
+| 0.0476 | 70   | 0.3318        | -               |
+| 0.0544 | 80   | 0.3336        | -               |
+| 0.0612 | 90   | 0.3373        | -               |
+| 0.0680 | 100  | 0.3031        | -               |
+| 0.0748 | 110  | 0.2494        | -               |
+| 0.0816 | 120  | 0.2763        | -               |
+| 0.0884 | 130  | 0.2850        | -               |
+| 0.0952 | 140  | 0.2927        | -               |
+| 0.1020 | 150  | 0.2210        | -               |
+| 0.1088 | 160  | 0.2481        | -               |
+| 0.1156 | 170  | 0.2450        | -               |
+| 0.1224 | 180  | 0.2550        | -               |
+| 0.1293 | 190  | 0.3398        | -               |
+| 0.1361 | 200  | 0.2951        | -               |
+| 0.1429 | 210  | 0.3026        | -               |
+| 0.1497 | 220  | 0.2586        | -               |
+| 0.1565 | 230  | 0.3357        | -               |
+| 0.1633 | 240  | 0.3025        | -               |
+| 0.1701 | 250  | 0.2366        | -               |
+| 0.1769 | 260  | 0.2824        | -               |
+| 0.1837 | 270  | 0.2706        | -               |
+| 0.1905 | 280  | 0.2837        | -               |
+| 0.1973 | 290  | 0.3077        | -               |
+| 0.2041 | 300  | 0.2692        | -               |
+| 0.2109 | 310  | 0.2555        | -               |
+| 0.2177 | 320  | 0.2701        | -               |
+| 0.2245 | 330  | 0.3042        | -               |
+| 0.2313 | 340  | 0.3110        | -               |
+| 0.2381 | 350  | 0.3097        | -               |
+| 0.2449 | 360  | 0.2901        | -               |
+| 0.2517 | 370  | 0.3143        | -               |
+| 0.2585 | 380  | 0.2329        | -               |
+| 0.2653 | 390  | 0.2012        | -               |
+| 0.2721 | 400  | 0.2885        | -               |
+| 0.2789 | 410  | 0.2627        | -               |
+| 0.2857 | 420  | 0.2832        | -               |
+| 0.2925 | 430  | 0.2267        | -               |
+| 0.2993 | 440  | 0.2021        | -               |
+| 0.3061 | 450  | 0.2383        | -               |
+| 0.3129 | 460  | 0.2664        | -               |
+| 0.3197 | 470  | 0.1627        | -               |
+| 0.3265 | 480  | 0.2313        | -               |
+| 0.3333 | 490  | 0.2479        | -               |
+| 0.3401 | 500  | 0.2149        | -               |
+| 0.3469 | 510  | 0.2360        | -               |
+| 0.3537 | 520  | 0.2588        | -               |
+| 0.3605 | 530  | 0.2494        | -               |
+| 0.3673 | 540  | 0.2658        | -               |
+| 0.3741 | 550  | 0.2071        | -               |
+| 0.3810 | 560  | 0.2088        | -               |
+| 0.3878 | 570  | 0.2210        | -               |
+| 0.3946 | 580  | 0.2568        | -               |
+| 0.4014 | 590  | 0.2708        | -               |
+| 0.4082 | 600  | 0.2039        | -               |
+| 0.4150 | 610  | 0.2951        | -               |
+| 0.4218 | 620  | 0.2618        | -               |
+| 0.4286 | 630  | 0.2498        | -               |
+| 0.4354 | 640  | 0.2517        | -               |
+| 0.4422 | 650  | 0.2290        | -               |
+| 0.4490 | 660  | 0.2519        | -               |
+| 0.4558 | 670  | 0.1955        | -               |
+| 0.4626 | 680  | 0.1801        | -               |
+| 0.4694 | 690  | 0.2114        | -               |
+| 0.4762 | 700  | 0.2344        | -               |
+| 0.4830 | 710  | 0.2043        | -               |
+| 0.4898 | 720  | 0.2586        | -               |
+| 0.4966 | 730  | 0.1933        | -               |
+| 0.5034 | 740  | 0.2643        | -               |
+| 0.5102 | 750  | 0.2527        | -               |
+| 0.5170 | 760  | 0.2313        | -               |
+| 0.5238 | 770  | 0.2130        | -               |
+| 0.5306 | 780  | 0.2293        | -               |
+| 0.5374 | 790  | 0.2217        | -               |
+| 0.5442 | 800  | 0.2526        | -               |
+| 0.5510 | 810  | 0.1908        | -               |
+| 0.5578 | 820  | 0.2210        | -               |
+| 0.5646 | 830  | 0.2513        | -               |
+| 0.5714 | 840  | 0.2218        | -               |
+| 0.5782 | 850  | 0.2793        | -               |
+| 0.5850 | 860  | 0.1769        | -               |
+| 0.5918 | 870  | 0.2928        | -               |
+| 0.5986 | 880  | 0.2183        | -               |
+| 0.6054 | 890  | 0.2250        | -               |
+| 0.6122 | 900  | 0.2556        | -               |
+| 0.6190 | 910  | 0.2157        | -               |
+| 0.6259 | 920  | 0.2382        | -               |
+| 0.6327 | 930  | 0.2333        | -               |
+| 0.6395 | 940  | 0.2154        | -               |
+| 0.6463 | 950  | 0.2958        | -               |
+| 0.6531 | 960  | 0.2868        | -               |
+| 0.6599 | 970  | 0.2327        | -               |
+| 0.6667 | 980  | 0.2330        | -               |
+| 0.6735 | 990  | 0.1849        | -               |
+| 0.6803 | 1000 | 0.2155        | -               |
+| 0.6871 | 1010 | 0.2072        | -               |
+| 0.6939 | 1020 | 0.1877        | -               |
+| 0.7007 | 1030 | 0.1972        | -               |
+| 0.7075 | 1040 | 0.2126        | -               |
+| 0.7143 | 1050 | 0.2671        | -               |
+| 0.7211 | 1060 | 0.2483        | -               |
+| 0.7279 | 1070 | 0.2026        | -               |
+| 0.7347 | 1080 | 0.1934        | -               |
+| 0.7415 | 1090 | 0.2028        | -               |
+| 0.7483 | 1100 | 0.2177        | -               |
+| 0.7551 | 1110 | 0.1885        | -               |
+| 0.7619 | 1120 | 0.2231        | -               |
+| 0.7687 | 1130 | 0.2556        | -               |
+| 0.7755 | 1140 | 0.2037        | -               |
+| 0.7823 | 1150 | 0.2297        | -               |
+| 0.7891 | 1160 | 0.1685        | -               |
+| 0.7959 | 1170 | 0.2257        | -               |
+| 0.8027 | 1180 | 0.2230        | -               |
+| 0.8095 | 1190 | 0.2092        | -               |
+| 0.8163 | 1200 | 0.1893        | -               |
+| 0.8231 | 1210 | 0.2524        | -               |
+| 0.8299 | 1220 | 0.2249        | -               |
+| 0.8367 | 1230 | 0.3169        | -               |
+| 0.8435 | 1240 | 0.2238        | -               |
+| 0.8503 | 1250 | 0.2013        | -               |
+| 0.8571 | 1260 | 0.2414        | -               |
+| 0.8639 | 1270 | 0.1624        | -               |
+| 0.8707 | 1280 | 0.1965        | -               |
+| 0.8776 | 1290 | 0.2293        | -               |
+| 0.8844 | 1300 | 0.2541        | -               |
+| 0.8912 | 1310 | 0.1607        | -               |
+| 0.8980 | 1320 | 0.2434        | -               |
+| 0.9048 | 1330 | 0.1819        | -               |
+| 0.9116 | 1340 | 0.2109        | -               |
+| 0.9184 | 1350 | 0.2081        | -               |
+| 0.9252 | 1360 | 0.2039        | -               |
+| 0.9320 | 1370 | 0.2903        | -               |
+| 0.9388 | 1380 | 0.2477        | -               |
+| 0.9456 | 1390 | 0.2139        | -               |
+| 0.9524 | 1400 | 0.2263        | -               |
+| 0.9592 | 1410 | 0.2211        | -               |
+| 0.9660 | 1420 | 0.2312        | -               |
+| 0.9728 | 1430 | 0.2267        | -               |
+| 0.9796 | 1440 | 0.2579        | -               |
+| 0.9864 | 1450 | 0.1949        | -               |
+| 0.9932 | 1460 | 0.2584        | -               |
+| 1.0    | 1470 | 0.1490        | 0.1673          |
 
+</details>
 
 ### Training Time
-- **Training**: 10.2 minutes
-- **Evaluation**: 8.6 seconds
-- **Total**: 10.4 minutes
+- **Training**: 13.2 minutes
+- **Evaluation**: 6.7 seconds
+- **Total**: 13.4 minutes
 
 ### Framework Versions
-- Python: 3.13.18
-- Sentence Transformers: 6.2.0
-- Transformers: 5.22.1
-- PyTorch: 2.15.0+cu132
+- Python: 3.13.16
+- Sentence Transformers: 5.7.0
+- Transformers: 5.22.0
+- PyTorch: 2.11.0+cu130
 - Accelerate: 1.15.0
-- Datasets: 5.1.0
+- Datasets: 4.8.5
 - Tokenizers: 0.23.3
 
 ## Additional Resources

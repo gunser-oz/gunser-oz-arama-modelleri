@@ -1,19 +1,19 @@
 {
-  "temel_model": "/home/user/gunser-oz-arama-modelleri/modeller/intfloat-multilingual-e5-small",
-  "veri": "egitim/veri/mmarco_tr_100000.jsonl",
-  "egitim_satiri": 9800,
-  "dogrulama_satiri": 200,
+  "temel_model": "intfloat/multilingual-e5-small",
+  "veri": "mmarco_tr.jsonl",
+  "egitim_satiri": 94050,
+  "dogrulama_satiri": 950,
   "test_ayrilan": 5000,
   "epoch": 1.0,
-  "batch": 16,
+  "batch": 64,
   "ogrenme_orani": 2e-05,
   "maks_uzunluk": 192,
   "kayip": "MultipleNegativesRankingLoss (InfoNCE, scale=50)",
-  "egitim_kaybi": 0.2021,
+  "egitim_kaybi": 0.2609,
   "dogrulama_kaybi": [
-    0.2266
+    0.1673
   ],
-  "adim": 613,
-  "sure_dk": 12.2,
-  "tarih": "2026-11-05 00:25"
+  "adim": 1470,
+  "sure_dk": 13.1,
+  "tarih": "2026-11-05 05:34"
 }
