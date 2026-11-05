@@ -22,6 +22,9 @@ jobs:
         run: |
           [ -n "$HF_TOKEN" ] && [ -n "$HF_SPACE" ] || { echo "HF_TOKEN ve HF_SPACE secret'ları gerekli"; exit 1; }
           sh web/birlestir.sh && rm web/model/onnx/model_quantized.onnx.part_*
+          # Belge verisi depoda değil, 'belgeler' release'indeki web_veri.tar.gz'den gelir
+          rm -rf web/veri && curl -sL -o /tmp/web_veri.tar.gz "https://github.com/${{ github.repository }}/releases/download/belgeler/web_veri.tar.gz"
+          tar -xzf /tmp/web_veri.tar.gz -C /tmp && mv /tmp/web_veri web/veri && ls web/veri
           cd web
           printf '%s\n' "---" "title: Günser Öz Arama" "emoji: ⚖️" "colorFrom: blue" "colorTo: gray" "sdk: static" "pinned: false" "---" "" \
             "Türkçe anlamsal belge araması. Model tarayıcıda çalışır, sorgular sunucuya gitmez." \
