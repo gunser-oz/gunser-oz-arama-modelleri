@@ -11,10 +11,6 @@ import re
 import sys
 from pathlib import Path
 
-import faiss
-import numpy as np
-from sentence_transformers import SentenceTransformer
-
 KOK = Path(__file__).resolve().parent.parent
 TEMEL_MODEL = KOK / "modeller" / "intfloat-multilingual-e5-small"
 UZANTILAR = {".pdf", ".docx", ".txt", ".md", ".html", ".htm"}
@@ -54,6 +50,11 @@ def parcala(metin: str, boy=700, bindirme=100):
 
 
 def main():
+    # Ağır kütüphaneler yalnızca indeksleme yapılırken yüklenir (metin_cikar.py bu dosyayı içe aktarır)
+    import faiss
+    import numpy as np
+    from sentence_transformers import SentenceTransformer
+
     p = argparse.ArgumentParser()
     p.add_argument("--klasor", required=True)
     p.add_argument("--indeks", default=str(KOK / "deneme" / "indeks"))
