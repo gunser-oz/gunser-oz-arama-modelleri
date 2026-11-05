@@ -73,7 +73,10 @@ def main():
             print(f"Atlandı {f}: {e}", file=sys.stderr)
             continue
         for i, metin in enumerate(parcalar):
-            kayitlar.append({"dosya": str(f.relative_to(a.klasor)), "parca": i, "metin": metin})
+            ad = str(f.relative_to(a.klasor))
+            if ad.endswith(".txt") and ad.count(".") >= 2:
+                ad = ad[:-4]  # metin_cikar.py çıktısı: "karar.pdf.txt" -> "karar.pdf"
+            kayitlar.append({"dosya": ad, "parca": i, "metin": metin})
         print(f"{f.name}: {len(parcalar)} parça", file=sys.stderr)
 
     model = SentenceTransformer(a.model)

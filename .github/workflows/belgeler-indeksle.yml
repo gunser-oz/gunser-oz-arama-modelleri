@@ -18,6 +18,7 @@ on:
 jobs:
   indeksle:
     runs-on: ubuntu-latest
+    timeout-minutes: 355
     permissions:
       contents: write
     steps:
@@ -32,22 +33,27 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
-      - name: Zip'leri indir ve aç
+      - name: Zip'leri tek tek indir, metne çevir, sil (disk tasarrufu)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p /tmp/zip /tmp/belgeler
-          gh release download "${{ inputs.tag }}" -D /tmp/zip
-          cd /tmp/zip
-          for ilk in *.part_aa; do [ -e "$ilk" ] && { ad="${ilk%.part_aa}"; cat "$ad".part_* > "$ad"; rm "$ad".part_*; }; done
-          for z in *.zip; do [ -e "$z" ] && unzip -o -q "$z" -d /tmp/belgeler -x '__MACOSX/*' '*.DS_Store'; done
-          echo "Dosya sayısı: $(find /tmp/belgeler -type f | wc -l)"
-          find /tmp/belgeler -type f | sed 's/.*\.//' | sort | uniq -c | sort -rn | head
+          mkdir -p /tmp/zip /tmp/metin
+          df -h /tmp | tail -1
+          for ad in $(gh release view "${{ inputs.tag }}" --json assets -q '.assets[].name' | grep -E '\.zip$'); do
+            echo "== $ad"
+            gh release download "${{ inputs.tag }}" -p "$ad" -D /tmp/zip
+            rm -rf /tmp/acilan && mkdir -p /tmp/acilan
+            unzip -o -q "/tmp/zip/$ad" -d /tmp/acilan -x '__MACOSX/*' '*.DS_Store' || true
+            rm -f "/tmp/zip/$ad"
+            python deneme/metin_cikar.py --klasor /tmp/acilan --cikti /tmp/metin
+            rm -rf /tmp/acilan
+          done
+          echo "Metin dosyası: $(find /tmp/metin -type f | wc -l), boyut: $(du -sh /tmp/metin | cut -f1)"
 
       - name: İndeksle
         run: |
           sh modeller/e5-small-mmarco-tr/birlestir.sh
-          python deneme/indeksle.py --klasor /tmp/belgeler --indeks /tmp/indeks --model modeller/e5-small-mmarco-tr --parca-boyu "${{ inputs.parca_boyu }}"
+          python deneme/indeksle.py --klasor /tmp/metin --indeks /tmp/indeks --model modeller/e5-small-mmarco-tr --parca-boyu "${{ inputs.parca_boyu }}"
           cat /tmp/indeks/bilgi.json
           python egitim/web_veri.py --indeks /tmp/indeks --cikti web/veri
 
