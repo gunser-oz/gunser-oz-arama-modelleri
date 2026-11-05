@@ -106,10 +106,22 @@ tar -xzf drive_indeks.tar.gz && python deneme/sunucu.py --indeks indeks
 sh modeller/e5-small-mmarco-tr/birlestir.sh
 ```
 
-## Web'den kullanım (Hugging Face Spaces)
+## Web'den kullanım (Hugging Face Static Space, ücretsiz)
 
-Depo, Docker ile Hugging Face Space olarak yayınlanır; sayfa `ARAMA_SIFRE` ile korunur.
-Kurulum: huggingface.co'da Docker türünde bir Space açın, write yetkili bir token alın,
-GitHub repo secret'larına `HF_TOKEN` ve `HF_SPACE` (ör. `kullanici/arama`) ekleyin,
-Space ayarlarına `ARAMA_SIFRE` adlı gizli değişken koyun. "Hugging Face Space'e yayınla"
-iş akışı her main güncellemesinde uygulamayı gönderir.
+`web/` klasörü sunucusuz bir arama sayfasıdır: ince ayarlı model 8 bit ONNX olarak tarayıcıda çalışır,
+indeks statik dosyadan okunur, sorgular hiçbir sunucuya gitmez. Hugging Face'te **Static** türünde,
+**Private** bir Space açın; GitHub secret'larına `HF_TOKEN` (write) ve `HF_SPACE` (ör. `ozanser/arama`)
+ekleyin. "Hugging Face Space'e yayınla" iş akışı `web/` her değiştiğinde sayfayı gönderir.
+
+Yerelde denemek için:
+
+```bash
+sh web/birlestir.sh
+cd web && python -m http.server 8003
+```
+
+Tarayıcı modelini ve verisini yeniden üretmek için:
+
+```bash
+python egitim/onnx_aktar.py --model modeller/e5-small-mmarco-tr --cikti web/model
+```

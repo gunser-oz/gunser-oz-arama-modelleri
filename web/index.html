@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Günser Öz Arama</title>
+<style>
+  :root { --bg:#f6f7f9; --kart:#fff; --metin:#1b1f24; --soluk:#6b7280; --vurgu:#1f6feb; --cizgi:#e5e7eb; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f1115; --kart:#181b21; --metin:#e6e8eb; --soluk:#9aa3ad; --vurgu:#58a6ff; --cizgi:#2a2f37; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--metin); }
+  main { max-width:900px; margin:0 auto; padding:32px 16px 64px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .alt { color:var(--soluk); font-size:14px; margin:0 0 20px; }
+  .kart { background:var(--kart); border:1px solid var(--cizgi); border-radius:12px; padding:20px; margin-bottom:16px; }
+  .satir { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
+  .satir > div { flex:1; min-width:220px; }
+  label { display:block; font-size:13px; color:var(--soluk); margin-bottom:6px; }
+  input { width:100%; font:inherit; padding:11px 12px; border:1px solid var(--cizgi); border-radius:8px; background:var(--bg); color:var(--metin); }
+  .btn { background:var(--vurgu); color:#fff; border:none; padding:12px 18px; border-radius:8px; font:inherit; font-weight:600; cursor:pointer; }
+  .btn:disabled { opacity:.5; cursor:wait; }
+  .ilerleme { height:6px; background:var(--cizgi); border-radius:3px; overflow:hidden; margin-top:12px; }
+  .ilerleme i { display:block; height:100%; width:0; background:var(--vurgu); transition:width .2s; }
+  .sonuc { padding:12px 0; border-top:1px solid var(--cizgi); font-size:14px; line-height:1.5; }
+  .sonuc:first-child { border-top:none; }
+  .kaynak { font-size:12px; color:var(--vurgu); margin-bottom:4px; }
+  .skor { font-size:12px; color:var(--soluk); margin-top:4px; }
+  .not { font-size:12px; color:var(--soluk); margin-top:8px; }
+  .hata { color:#d1242f; font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Günser Öz Arama</h1>
+  <p class="alt" id="durum">Model yükleniyor, ilk açılışta yaklaşık 120 MB iner ve tarayıcı önbelleğinde kalır…</p>
+  <div class="kart">
+    <div class="satir">
+      <div><label>Sorgu</label><input id="sorgu" placeholder="örn. yargılama çok uzun sürdü tazminat alabilir miyim" autofocus></div>
+      <div style="flex:0 0 90px"><label>Sonuç</label><input id="k" type="number" value="5" min="1" max="20"></div>
+      <button class="btn" id="araBtn" disabled>Ara</button>
+    </div>
+    <div class="ilerleme"><i id="bar"></i></div>
+    <p class="not">Arama tamamen tarayıcınızda çalışır; sorgularınız hiçbir sunucuya gönderilmez.</p>
+  </div>
+  <div class="kart" id="sonuclar" style="display:none"></div>
+  <p class="hata" id="hata"></p>
+</main>
+<script type="module">
+import { pipeline, env } from "./lib/transformers.min.js";
+env.backends.onnx.wasm.wasmPaths = new URL("./lib/", location.href).href;
+env.allowRemoteModels = false;
+env.allowLocalModels = true;
+env.localModelPath = "./";
+
+const $ = s => document.querySelector(s);
+const durum = m => $("#durum").textContent = m;
+let model, vektorler, kayitlar, boyut;
+
+function f16toF32(u16) {
+  // Float16 → Float32 (tarayıcıda Float16Array her yerde yok)
+  const out = new Float32Array(u16.length);
+  for (let i = 0; i < u16.length; i++) {
+    const h = u16[i], s = (h & 0x8000) ? -1 : 1, e = (h >> 10) & 0x1f, f = h & 0x3ff;
+    out[i] = e === 0 ? s * Math.pow(2, -14) * (f / 1024) : e === 31 ? (f ? NaN : s * Infinity) : s * Math.pow(2, e - 15) * (1 + f / 1024);
+  }
+  return out;
+}
+
+async function yukle() {
+  try {
+    const [kayitYanit, vekYanit] = await Promise.all([fetch("veri/kayitlar.json"), fetch("veri/vektorler.f16")]);
+    const k = await kayitYanit.json();
+    kayitlar = k.kayitlar; boyut = k.boyut;
+    vektorler = f16toF32(new Uint16Array(await vekYanit.arrayBuffer()));
+    model = await pipeline("feature-extraction", "model", {
+      dtype: "q8",
+      progress_callback: p => { if (p.status === "progress" && p.file.endsWith(".onnx")) $("#bar").style.width = p.progress.toFixed(0) + "%"; },
+    });
+    $("#bar").style.width = "100%";
+    const dosya = new Set(kayitlar.map(x => x.dosya)).size;
+    durum(`Hazır · ${dosya} dosya, ${kayitlar.length} parça indeksli · model tarayıcıda çalışıyor`);
+    $("#araBtn").disabled = false;
+  } catch (e) { $("#hata").textContent = "Yükleme hatası: " + e.message; durum("Yüklenemedi"); }
+}
+
+async function ara() {
+  const sorgu = $("#sorgu").value.trim(); if (!sorgu || !model) return;
+  $("#araBtn").disabled = true;
+  try {
+    const q = await model("query: " + sorgu, { pooling: "mean", normalize: true });
+    const qv = q.data, k = +$("#k").value, n = kayitlar.length;
+    const skor = new Float32Array(n);
+    for (let i = 0; i < n; i++) { let s = 0; const o = i * boyut; for (let j = 0; j < boyut; j++) s += qv[j] * vektorler[o + j]; skor[i] = s; }
+    const sira = Array.from(skor.keys()).sort((a, b) => skor[b] - skor[a]).slice(0, k);
+    $("#sonuclar").style.display = "block";
+    $("#sonuclar").innerHTML = sira.map(i => `<div class="sonuc"><div class="kaynak">${kayitlar[i].dosya}</div>${kayitlar[i].metin}<div class="skor">benzerlik ${skor[i].toFixed(3)}</div></div>`).join("");
+  } catch (e) { $("#hata").textContent = "Arama hatası: " + e.message; }
+  finally { $("#araBtn").disabled = false; }
+}
+$("#araBtn").onclick = ara;
+$("#sorgu").addEventListener("keydown", e => { if (e.key === "Enter") ara(); });
+yukle();
+</script>
+</body>
+</html>

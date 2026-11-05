@@ -1,5 +1,5 @@
 {
-  "model": "modeller/intfloat-multilingual-e5-small",
+  "model": "modeller/e5-small-mmarco-tr",
   "dosya_sayisi": 119,
   "parca_sayisi": 2558
 }

@@ -1,21 +1,19 @@
 name: Hugging Face Space'e yayınla
 
-# main dalındaki arama uygulamasını Hugging Face Space'e gönderir.
-# Gereken secret'lar: HF_TOKEN (write yetkili), HF_SPACE (ör. kullanici/arama)
+# web/ klasörünü Static Space olarak Hugging Face'e gönderir (ücretsiz, sunucusuz;
+# model tarayıcıda çalışır). Gereken secret'lar: HF_TOKEN (write), HF_SPACE (ör. ozanser/arama)
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [deneme/**, modeller/e5-small-mmarco-tr/**, Dockerfile, requirements.txt]
+    paths: [web/**]
 
 jobs:
   yayinla:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
 
       - name: Space'e gönder
         env:
@@ -23,13 +21,17 @@ jobs:
           HF_SPACE: ${{ secrets.HF_SPACE }}
         run: |
           [ -n "$HF_TOKEN" ] && [ -n "$HF_SPACE" ] || { echo "HF_TOKEN ve HF_SPACE secret'ları gerekli"; exit 1; }
+          sh web/birlestir.sh && rm web/model/onnx/model_quantized.onnx.part_*
+          cd web
+          printf '%s\n' "---" "title: Günser Öz Arama" "emoji: ⚖️" "colorFrom: blue" "colorTo: gray" "sdk: static" "pinned: false" "---" "" \
+            "Türkçe anlamsal belge araması. Model tarayıcıda çalışır, sorgular sunucuya gitmez." \
+            "Kaynak: https://github.com/gunser-oz/gunser-oz-arama-modelleri" > README.md
+          git init -q -b main
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          # Space için ayrı bir dal: büyük LFS dosyalarını (temel model) dışarıda bırak
-          git checkout -B space
-          git rm -r -q --cached modeller/intfloat-multilingual-e5-small egitim .github 2>/dev/null || true
-          printf '%s\n' "---" "title: Günser Öz Arama" "sdk: docker" "app_port: 7860" "---" "" "Türkçe anlamsal arama sunucusu. Kaynak: GitHub gunser-oz/gunser-oz-arama-modelleri" > README.md
-          git add README.md
+          git lfs install --local
+          git lfs track "*.onnx" "*.wasm" "*.f16" "lib/*.js" "lib/*.mjs" "veri/*.json" >/dev/null
+          git add -A
           git commit -q -m "Space yayını: $GITHUB_SHA"
-          git push -f "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" space:main
+          git push -f "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" main
           echo "Yayınlandı: https://huggingface.co/spaces/${HF_SPACE}"
