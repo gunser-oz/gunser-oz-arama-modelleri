@@ -33,24 +33,45 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
+      - name: Önceki çalıştırmadan çevrilmiş metinleri geri yükle
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/metin
+          key: metin-${{ inputs.tag }}-${{ github.run_id }}
+          restore-keys: metin-${{ inputs.tag }}-
+
       - name: Zip'leri tek tek indir, metne çevir, sil (disk tasarrufu)
+        id: cevir
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p /tmp/zip /tmp/metin
           df -h /tmp | tail -1
+          # Bitmiş zip'ler işaretlenir; süre dolarsa (4 saat) kalanlar sonraki çalıştırmaya bırakılır
           for ad in $(gh release view "${{ inputs.tag }}" --json assets -q '.assets[].name' | grep -E '\.zip$'); do
-            echo "== $ad"
+            [ -f "/tmp/metin/.bitti-$ad" ] && { echo "Atlandı (önceden çevrildi): $ad"; continue; }
+            if [ "$SECONDS" -gt 14400 ]; then echo "Süre sınırı: $ad sonraki çalıştırmada"; echo "tamam=false" >> $GITHUB_OUTPUT; exit 0; fi
+            echo "== $ad ($((SECONDS/60)) dk)"
             gh release download "${{ inputs.tag }}" -p "$ad" -D /tmp/zip
             rm -rf /tmp/acilan && mkdir -p /tmp/acilan
             unzip -o -q "/tmp/zip/$ad" -d /tmp/acilan -x '__MACOSX/*' '*.DS_Store' || true
             rm -f "/tmp/zip/$ad"
             python deneme/metin_cikar.py --klasor /tmp/acilan --cikti /tmp/metin
             rm -rf /tmp/acilan
+            touch "/tmp/metin/.bitti-$ad"
           done
+          echo "tamam=true" >> $GITHUB_OUTPUT
           echo "Metin dosyası: $(find /tmp/metin -type f | wc -l), boyut: $(du -sh /tmp/metin | cut -f1)"
 
+      - name: Çevrilmiş metinleri sakla
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/metin
+          key: metin-${{ inputs.tag }}-${{ github.run_id }}
+
       - name: İndeksle
+        if: steps.cevir.outputs.tamam == 'true'
         run: |
           sh modeller/e5-small-mmarco-tr/birlestir.sh
           python deneme/indeksle.py --klasor /tmp/metin --indeks /tmp/indeks --model modeller/e5-small-mmarco-tr --parca-boyu "${{ inputs.parca_boyu }}"
@@ -58,6 +79,7 @@ jobs:
           python egitim/web_veri.py --indeks /tmp/indeks --cikti web/veri
 
       - name: İndeksi release'e yükle (sunucu sürümü için)
+        if: steps.cevir.outputs.tamam == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -65,6 +87,7 @@ jobs:
           gh release upload "${{ inputs.tag }}" /tmp/indeks.tar.gz --clobber
 
       - name: Tarayıcı verisini main'e commit et
+        if: steps.cevir.outputs.tamam == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
@@ -73,3 +96,7 @@ jobs:
           git commit -q -m "web/veri: belge indeksi güncellendi ($(python -c "import json;b=json.load(open('/tmp/indeks/bilgi.json'));print(b['dosya_sayisi'],'dosya,',b['parca_sayisi'],'parça')"))"
           git push
           echo "Not: bu push Space yayınını tetiklemez; 'Hugging Face Space'e yayınla' iş akışını elle çalıştırın."
+
+      - name: Devam gerekiyor mu
+        if: steps.cevir.outputs.tamam != 'true'
+        run: echo "Metne çevirme bitmedi; iş akışını aynı girdilerle yeniden çalıştırın, kaldığı yerden sürer."
