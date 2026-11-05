@@ -45,6 +45,7 @@ def main():
     p.add_argument("--en-fazla", type=int, default=0, help="En fazla bu kadar satırla eğit (0 = hepsi)")
     p.add_argument("--maks-uzunluk", type=int, default=256, help="Token cinsinden en uzun girdi")
     p.add_argument("--kaydet-adim", type=int, default=200, help="Bu kadar adımda bir ara kayıt (0 = kapalı)")
+    p.add_argument("--devam", default=None, help="Ara kayıt klasörü (ör. cikti/x/checkpoint-450); eğitime oradan devam eder")
     a = p.parse_args()
 
     model = SentenceTransformer(a.model)
@@ -84,7 +85,7 @@ def main():
         model=model, args=args, train_dataset=egitim, eval_dataset=dogrulama, loss=kayip
     )
     baslangic = time.time()
-    sonuc = trainer.train()
+    sonuc = trainer.train(resume_from_checkpoint=a.devam)
     sure = time.time() - baslangic
 
     son = Path(a.cikti) / "final"

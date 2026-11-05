@@ -41,6 +41,16 @@ if a.indeks:
     modeller = {"temel": SentenceTransformer(bilgi["model"])}
     faiss_indeks = faiss.read_index(str(Path(a.indeks) / "vektorler.faiss"))
     indeks = None
+    if a.karsilastir:
+        # İnce ayarlı modelle aynı belgeleri yeniden vektörleyip ikinci bir FAISS indeksi kur
+        import numpy as np
+        m2 = SentenceTransformer(a.karsilastir)
+        modeller["ince_ayar"] = m2
+        v2 = np.asarray(m2.encode(["passage: " + b for b in belgeler], normalize_embeddings=True, batch_size=32), dtype="float32")
+        faiss2 = faiss.IndexFlatIP(v2.shape[1]); faiss2.add(v2)
+        faiss_indeksler = {"temel": faiss_indeks, "ince_ayar": faiss2}
+    else:
+        faiss_indeksler = {"temel": faiss_indeks}
 else:
     belgeler = [s.strip() for s in Path(a.belgeler).read_text(encoding="utf-8").splitlines() if s.strip()]
     kaynaklar = [None] * len(belgeler)
@@ -124,7 +134,7 @@ def ara(s: Sorgu):
     for ad, m in modeller.items():
         if faiss_indeks is not None:
             q = m.encode(["query: " + s.sorgu], normalize_embeddings=True)
-            skor, idx = faiss_indeks.search(q.astype("float32"), s.k)
+            skor, idx = faiss_indeksler[ad].search(q.astype("float32"), s.k)
             ciftler = [(int(i), float(sk)) for i, sk in zip(idx[0], skor[0]) if i >= 0]
         else:
             q = m.encode("query: " + s.sorgu, normalize_embeddings=True, convert_to_tensor=True)
