@@ -20,6 +20,10 @@ on:
         description: Vektörleyen model klasörü
         required: true
         default: modeller/e5-small-mmarco-tr
+      bekle:
+        description: Dosyalar arası bekleme (saniye); Drive kotasını zorlamamak için
+        required: true
+        default: "1"
 
 jobs:
   indeksle:
@@ -43,14 +47,28 @@ jobs:
         run: |
           [ -f "${{ inputs.model }}/birlestir.sh" ] && sh "${{ inputs.model }}/birlestir.sh" || true
 
+      - name: Daha önce indirilenleri geri yükle
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/belgeler
+          key: drive-${{ inputs.klasor_id }}-${{ github.run_id }}
+          restore-keys: drive-${{ inputs.klasor_id }}-
+
       - name: Drive'dan indir
         env:
           GDRIVE_SERVIS_HESABI: ${{ secrets.GDRIVE_SERVIS_HESABI }}
         run: |
           [ -n "$GDRIVE_SERVIS_HESABI" ] || { echo "GDRIVE_SERVIS_HESABI secret tanımlı değil"; exit 1; }
           echo "$GDRIVE_SERVIS_HESABI" > /tmp/sa.json
-          python deneme/drive_indir.py --servis-hesabi /tmp/sa.json --klasor-id "${{ inputs.klasor_id }}" --hedef /tmp/belgeler
+          python deneme/drive_indir.py --servis-hesabi /tmp/sa.json --klasor-id "${{ inputs.klasor_id }}" --hedef /tmp/belgeler --bekle "${{ inputs.bekle }}"
           find /tmp/belgeler -type f | wc -l
+
+      - name: İndirilenleri sakla
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/belgeler
+          key: drive-${{ inputs.klasor_id }}-${{ github.run_id }}
 
       - name: İndeksle
         run: |
