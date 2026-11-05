@@ -1,0 +1,87 @@
+name: Modeli eğit (GitHub sunucusunda)
+
+# Tam veriyle ince ayar. GitHub'ın 6 saatlik sınırına takılırsa ara kayıt önbelleğe alınır;
+# iş akışı yeniden tetiklendiğinde kaldığı yerden devam eder. Bitince model release'e yüklenir.
+
+on:
+  workflow_dispatch:
+    inputs:
+      satir:
+        description: Kaç satırla eğitilecek (0 = hepsi)
+        required: true
+        default: "0"
+      tag:
+        description: Sonucun yükleneceği release
+        required: true
+        default: model-gpu
+
+jobs:
+  egit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Bağımlılıklar
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt onnxruntime
+
+      - name: Veri
+        run: |
+          curl -sL -o mmarco_tr.jsonl.gz https://github.com/${{ github.repository }}/releases/download/veri-mmarco-tr/mmarco_tr_100000.jsonl.gz
+          gunzip -f mmarco_tr.jsonl.gz && wc -l mmarco_tr.jsonl
+
+      - name: Ara kaydı geri yükle
+        id: onbellek
+        uses: actions/cache/restore@v4
+        with:
+          path: cikti
+          key: egitim-${{ inputs.satir }}-${{ github.run_id }}
+          restore-keys: egitim-${{ inputs.satir }}-
+
+      - name: Eğit (en fazla 5 saat, sonra ara kayıtla durur)
+        id: egitim
+        run: |
+          son=$(ls -d cikti/e5/checkpoint-* 2>/dev/null | sort -t- -k2 -n | tail -1)
+          [ -n "$son" ] && echo "Devam: $son" && DEVAM="--devam $son" || DEVAM=""
+          [ "${{ inputs.satir }}" != "0" ] && SATIR="--en-fazla ${{ inputs.satir }}" || SATIR=""
+          set +e
+          timeout 300m python egitim/egit.py --veri mmarco_tr.jsonl --model intfloat/multilingual-e5-small \
+            --cikti cikti/e5 --test-ayir 5000 --epoch 1 --batch 32 --maks-uzunluk 192 \
+            --dogrulama-orani 0.01 --kaydet-adim 200 $SATIR $DEVAM
+          kod=$?
+          set -e
+          [ -f cikti/e5/final/egitim_ozeti.json ] && echo "bitti=true" >> $GITHUB_OUTPUT || { echo "bitti=false" >> $GITHUB_OUTPUT; echo "Süre doldu (kod $kod); ara kayıt saklanıyor, iş akışını yeniden tetikleyin."; }
+
+      - name: Ara kaydı sakla
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cikti
+          key: egitim-${{ inputs.satir }}-${{ github.run_id }}
+
+      - name: Değerlendir ve tarayıcı modeline çevir
+        if: steps.egitim.outputs.bitti == 'true'
+        run: |
+          python egitim/degerlendir.py --veri mmarco_tr.jsonl --test 5000 --sorgu 1000 \
+            --model intfloat/multilingual-e5-small --model cikti/e5/final --rapor cikti/degerlendirme.json
+          python egitim/onnx_aktar.py --model cikti/e5/final --cikti cikti/web_model
+          python -c "from huggingface_hub import hf_hub_download as d; [d('intfloat/multilingual-e5-small', f, local_dir='cikti/web_model') for f in ('tokenizer.json','tokenizer_config.json','special_tokens_map.json')]"
+          rm -f cikti/web_model/onnx/model.onnx
+          cd cikti && rm -rf e5/checkpoint-* && mv e5/final final && zip -qr model_gpu.zip final degerlendirme.json && zip -qr web_model_gpu.zip web_model && ls -la *.zip
+
+      - name: Release'e yükle
+        if: steps.egitim.outputs.bitti == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "${{ inputs.tag }}" >/dev/null 2>&1 || gh release create "${{ inputs.tag }}" --title "Tam veriyle eğitilmiş Türkçe model" --notes "model-egit.yml ile üretildi"
+          gh release upload "${{ inputs.tag }}" cikti/model_gpu.zip cikti/web_model_gpu.zip --clobber
+          echo "Yüklendi."
