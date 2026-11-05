@@ -35,7 +35,7 @@ jobs:
 
       - name: Veri
         run: |
-          curl -sL -o mmarco_tr.jsonl.gz https://github.com/${{ github.repository }}/releases/download/veri-mmarco-tr/mmarco_tr_100000.jsonl.gz
+          curl -sL -o mmarco_tr.jsonl.gz https://raw.githubusercontent.com/${{ github.repository }}/main/egitim/veri/mmarco_tr_100000.jsonl.gz
           gunzip -f mmarco_tr.jsonl.gz && wc -l mmarco_tr.jsonl
 
       - name: Ara kaydı geri yükle

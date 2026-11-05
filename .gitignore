@@ -4,7 +4,8 @@ __pycache__/
 *.pyc
 egitim/*.jsonl
 !egitim/veri_ornek.jsonl
-egitim/veri/
+egitim/veri/*
+!egitim/veri/mmarco_tr_100000.jsonl.gz
 
 belgelerim/
 credentials.json
