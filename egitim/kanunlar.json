@@ -1,0 +1,404 @@
+{
+ "tck": {
+  "no": "5237",
+  "adlar": [
+   "Türk Ceza Kanunu"
+  ]
+ },
+ "cmk": {
+  "no": "5271",
+  "adlar": [
+   "Ceza Muhakemesi Kanunu"
+  ]
+ },
+ "hmk": {
+  "no": "6100",
+  "adlar": [
+   "Hukuk Muhakemeleri Kanunu"
+  ]
+ },
+ "humk": {
+  "no": "1086",
+  "adlar": [
+   "Hukuk Usulü Muhakemeleri Kanunu"
+  ]
+ },
+ "tmk": {
+  "no": "4721",
+  "adlar": [
+   "Türk Medeni Kanunu",
+   "Medeni Kanun"
+  ]
+ },
+ "tbk": {
+  "no": "6098",
+  "adlar": [
+   "Türk Borçlar Kanunu",
+   "Borçlar Kanunu"
+  ]
+ },
+ "ttk": {
+  "no": "6102",
+  "adlar": [
+   "Türk Ticaret Kanunu",
+   "Ticaret Kanunu"
+  ]
+ },
+ "iik": {
+  "no": "2004",
+  "adlar": [
+   "İcra ve İflas Kanunu",
+   "İcra İflas Kanunu"
+  ]
+ },
+ "isk": {
+  "no": "4857",
+  "adlar": [
+   "İş Kanunu"
+  ]
+ },
+ "iyuk": {
+  "no": "2577",
+  "adlar": [
+   "İdari Yargılama Usulü Kanunu"
+  ]
+ },
+ "vuk": {
+  "no": "213",
+  "adlar": [
+   "Vergi Usul Kanunu"
+  ]
+ },
+ "kvkk": {
+  "no": "6698",
+  "adlar": [
+   "Kişisel Verilerin Korunması Kanunu"
+  ]
+ },
+ "tkhk": {
+  "no": "6502",
+  "adlar": [
+   "Tüketicinin Korunması Hakkında Kanun"
+  ]
+ },
+ "smk": {
+  "no": "6769",
+  "adlar": [
+   "Sınai Mülkiyet Kanunu"
+  ]
+ },
+ "fsek": {
+  "no": "5846",
+  "adlar": [
+   "Fikir ve Sanat Eserleri Kanunu"
+  ]
+ },
+ "ktk": {
+  "no": "2918",
+  "adlar": [
+   "Karayolları Trafik Kanunu"
+  ]
+ },
+ "kmk": {
+  "no": "634",
+  "adlar": [
+   "Kat Mülkiyeti Kanunu"
+  ]
+ },
+ "avk": {
+  "no": "1136",
+  "adlar": [
+   "Avukatlık Kanunu"
+  ]
+ },
+ "sgk": {
+  "no": "5510",
+  "adlar": [
+   "Sosyal Sigortalar ve Genel Sağlık Sigortası Kanunu"
+  ]
+ },
+ "kik": {
+  "no": "4734",
+  "adlar": [
+   "Kamu İhale Kanunu"
+  ]
+ },
+ "kisk": {
+  "no": "4735",
+  "adlar": [
+   "Kamu İhale Sözleşmeleri Kanunu"
+  ]
+ },
+ "rkhk": {
+  "no": "4054",
+  "adlar": [
+   "Rekabetin Korunması Hakkında Kanun"
+  ]
+ },
+ "dmk": {
+  "no": "657",
+  "adlar": [
+   "Devlet Memurları Kanunu"
+  ]
+ },
+ "gvk": {
+  "no": "193",
+  "adlar": [
+   "Gelir Vergisi Kanunu"
+  ]
+ },
+ "kvk": {
+  "no": "5520",
+  "adlar": [
+   "Kurumlar Vergisi Kanunu"
+  ]
+ },
+ "kdvk": {
+  "no": "3065",
+  "adlar": [
+   "Katma Değer Vergisi Kanunu"
+  ]
+ },
+ "aatuhk": {
+  "no": "6183",
+  "adlar": [
+   "Amme Alacaklarının Tahsil Usulü Hakkında Kanun"
+  ]
+ },
+ "tebligat": {
+  "no": "7201",
+  "adlar": [
+   "Tebligat Kanunu"
+  ]
+ },
+ "anayasa": {
+  "no": "2709",
+  "adlar": [
+   "Anayasa"
+  ]
+ },
+ "aihs": {
+  "no": "",
+  "adlar": [
+   "Avrupa İnsan Hakları Sözleşmesi"
+  ]
+ },
+ "cgtik": {
+  "no": "5275",
+  "adlar": [
+   "Ceza ve Güvenlik Tedbirlerinin İnfazı Hakkında Kanun",
+   "İnfaz Kanunu"
+  ]
+ },
+ "kabahatler": {
+  "no": "5326",
+  "adlar": [
+   "Kabahatler Kanunu"
+  ]
+ },
+ "tmk_teror": {
+  "no": "3713",
+  "adlar": [
+   "Terörle Mücadele Kanunu"
+  ]
+ },
+ "spk": {
+  "no": "6362",
+  "adlar": [
+   "Sermaye Piyasası Kanunu"
+  ]
+ },
+ "bankacilik": {
+  "no": "5411",
+  "adlar": [
+   "Bankacılık Kanunu"
+  ]
+ },
+ "sigortacilik": {
+  "no": "5684",
+  "adlar": [
+   "Sigortacılık Kanunu"
+  ]
+ },
+ "cevre": {
+  "no": "2872",
+  "adlar": [
+   "Çevre Kanunu"
+  ]
+ },
+ "imar": {
+  "no": "3194",
+  "adlar": [
+   "İmar Kanunu"
+  ]
+ },
+ "kamulastirma": {
+  "no": "2942",
+  "adlar": [
+   "Kamulaştırma Kanunu"
+  ]
+ },
+ "belediye": {
+  "no": "5393",
+  "adlar": [
+   "Belediye Kanunu"
+  ]
+ },
+ "arabuluculuk": {
+  "no": "6325",
+  "adlar": [
+   "Hukuk Uyuşmazlıklarında Arabuluculuk Kanunu",
+   "Arabuluculuk Kanunu"
+  ]
+ },
+ "tahkim": {
+  "no": "4686",
+  "adlar": [
+   "Milletlerarası Tahkim Kanunu"
+  ]
+ },
+ "mohuk": {
+  "no": "5718",
+  "adlar": [
+   "Milletlerarası Özel Hukuk ve Usul Hukuku Hakkında Kanun"
+  ]
+ },
+ "ailenin_korunmasi": {
+  "no": "6284",
+  "adlar": [
+   "Ailenin Korunması ve Kadına Karşı Şiddetin Önlenmesine Dair Kanun"
+  ]
+ },
+ "internet": {
+  "no": "5651",
+  "adlar": [
+   "İnternet Ortamında Yapılan Yayınların Düzenlenmesi"
+  ]
+ },
+ "basin": {
+  "no": "5187",
+  "adlar": [
+   "Basın Kanunu"
+  ]
+ },
+ "noterlik": {
+  "no": "1512",
+  "adlar": [
+   "Noterlik Kanunu"
+  ]
+ },
+ "kooperatifler": {
+  "no": "1163",
+  "adlar": [
+   "Kooperatifler Kanunu"
+  ]
+ },
+ "dernekler": {
+  "no": "5253",
+  "adlar": [
+   "Dernekler Kanunu"
+  ]
+ },
+ "vakiflar": {
+  "no": "5737",
+  "adlar": [
+   "Vakıflar Kanunu"
+  ]
+ },
+ "tapu": {
+  "no": "2644",
+  "adlar": [
+   "Tapu Kanunu"
+  ]
+ },
+ "kadastro": {
+  "no": "3402",
+  "adlar": [
+   "Kadastro Kanunu"
+  ]
+ },
+ "orman": {
+  "no": "6831",
+  "adlar": [
+   "Orman Kanunu"
+  ]
+ },
+ "yabancilar": {
+  "no": "6458",
+  "adlar": [
+   "Yabancılar ve Uluslararası Koruma Kanunu"
+  ]
+ },
+ "vatandaslik": {
+  "no": "5901",
+  "adlar": [
+   "Türk Vatandaşlığı Kanunu"
+  ]
+ },
+ "bilgi_edinme": {
+  "no": "4982",
+  "adlar": [
+   "Bilgi Edinme Hakkı Kanunu"
+  ]
+ },
+ "elektrik": {
+  "no": "6446",
+  "adlar": [
+   "Elektrik Piyasası Kanunu"
+  ]
+ },
+ "kacakcilik": {
+  "no": "5607",
+  "adlar": [
+   "Kaçakçılıkla Mücadele Kanunu"
+  ]
+ },
+ "sendikalar": {
+  "no": "6356",
+  "adlar": [
+   "Sendikalar ve Toplu İş Sözleşmesi Kanunu"
+  ]
+ },
+ "isg": {
+  "no": "6331",
+  "adlar": [
+   "İş Sağlığı ve Güvenliği Kanunu"
+  ]
+ },
+ "ik_mahkemeleri": {
+  "no": "7036",
+  "adlar": [
+   "İş Mahkemeleri Kanunu"
+  ]
+ },
+ "sayistay": {
+  "no": "6085",
+  "adlar": [
+   "Sayıştay Kanunu"
+  ]
+ },
+ "kmyk": {
+  "no": "5018",
+  "adlar": [
+   "Kamu Mali Yönetimi ve Kontrol Kanunu"
+  ]
+ },
+ "tihek": {
+  "no": "6701",
+  "adlar": [
+   "Türkiye İnsan Hakları ve Eşitlik Kurumu Kanunu"
+  ]
+ },
+ "engelliler": {
+  "no": "5378",
+  "adlar": [
+   "Engelliler Hakkında Kanun"
+  ]
+ },
+ "aym": {
+  "no": "6216",
+  "adlar": [
+   "Anayasa Mahkemesinin Kuruluşu ve Yargılama Usulleri Hakkında Kanun"
+  ]
+ }
+}

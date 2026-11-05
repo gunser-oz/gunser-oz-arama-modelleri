@@ -98,20 +98,40 @@ async function yukle() {
   } catch (e) { $("#hata").textContent = "Yükleme hatası: " + e.message; durum("Yüklenemedi"); }
 }
 
-// ---- Kanun maddesi atıfları (ör. "tck 181", "HMK m. 166", "5237 sayılı Kanun'un 181. maddesi") ----
-const KANUN_NO = { "5237":"tck","5271":"cmk","6100":"hmk","4721":"tmk","6098":"tbk","6102":"ttk","2004":"iik","4857":"isk","2577":"iyuk","213":"vuk","6698":"kvkk","6502":"tkhk","1086":"humk","5510":"sgk","4734":"kik","4054":"rkhk","2709":"anayasa","2918":"ktk","6183":"aatuhk","193":"gvk","5520":"kvk","3065":"kdv","6769":"smk","5846":"fsek","7201":"tebligat","657":"dmk","6325":"arabuluculuk","4686":"tahkim" };
-const KISALTMA = "(?:T\\.?C\\.?K|C\\.?M\\.?K|H\\.?M\\.?K|T\\.?M\\.?K|T\\.?B\\.?K|T\\.?T\\.?K|İ\\.?İ\\.?K|H\\.?U\\.?M\\.?K|İ\\.?Y\\.?U\\.?K|V\\.?U\\.?K|K\\.?V\\.?K\\.?K|T\\.?K\\.?H\\.?K|S\\.?M\\.?K|F\\.?S\\.?E\\.?K|K\\.?T\\.?K|A\\.?A\\.?T\\.?U\\.?H\\.?K|G\\.?V\\.?K|K\\.?V\\.?K|K\\.?İ\\.?K|R\\.?K\\.?H\\.?K|D\\.?M\\.?K|İş\\s?K(?:anunu)?|AİHS|Anayasa)";
-const MADDE = "(?:'?[nN]ın|'?[nN]in|'?[nN]un|'?[nN]ün|'?nda|'?nde)?\\s*(?:m(?:adde(?:si|sinin|sinde)?|d)?\\.?\\s*)?(\\d{1,4})(?:\\s*[./]\\s*\\d{1,2})?";
-const kisalt = k => k.replace(/[. ]/g, "").replace(/İ/g, "i").replace(/I/g, "i").toLowerCase().replace(/ı/g,"i").replace(/ş/g,"s").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/ğ/g,"g").replace("iskanunu","isk");
-function atiflariBul(sorgu) {
-  const anahtarlar = new Set(), etiketler = [];
-  for (const e of sorgu.matchAll(new RegExp("\\b(" + KISALTMA + ")" + MADDE, "giu"))) { anahtarlar.add(`${kisalt(e[1])}:${+e[2]}`); etiketler.push(`${e[1].toUpperCase().replace(/\./g,"")} ${+e[2]}`); }
-  for (const e of sorgu.matchAll(/\b(\d{3,4})\s*sayılı\s*(?:Türk\s+)?[\p{L}' ]{0,40}?(?:Kanun|Yasa)[^.\d]{0,30}?(\d{1,4})\s*\.?\s*(?:madde|md|m)/giu)) { const ad = KANUN_NO[e[1]] || "kanun" + e[1]; anahtarlar.add(`${ad}:${+e[2]}`); etiketler.push(`${e[1]} sayılı Kanun m. ${+e[2]}`); }
-  if (!anahtarlar.size) for (const e of sorgu.matchAll(/\b(\d{1,4})\s*\.?\s*madde|\bmadde\s*(\d{1,4})\b/giu)) { const n = +(e[1] || e[2]); anahtarlar.add(`madde:${n}`); etiketler.push(`madde ${n}`); }
-  return { anahtarlar: [...anahtarlar], etiketler };
+// ---- Kanun maddesi atıfları: kurallar egitim/atif_indeksi.py ile aynı, kanun listesi veri/kanunlar.json ----
+// Türkçe İ/ı sorununu aşmak için eşleme ASCII'ye indirgenmiş kopya üzerinde yapılır.
+let KANUNLAR = null;
+const asciiKucult = k => k.replace(/İ/g, "i").replace(/I/g, "i").toLowerCase().replace(/ı/g,"i").replace(/ş/g,"s").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/ğ/g,"g");
+const kisaltmaAnahtari = h => { const k = asciiKucult(h.replace(/[. ]/g, "")); return { iskanunu: "isk", ay: "anayasa" }[k] || k; };
+const onEk = tip => !tip ? "" : tip.startsWith("ge") ? "gecici_" : "ek_";
+const kacR = t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function atiflariBul(sorguHam) {
+  const sorgu = asciiKucult(sorguHam);
+  const no2kis = {}, ad2kis = {}; for (const [k, v] of Object.entries(KANUNLAR)) { if (v.no) no2kis[v.no] = k; for (const a of v.adlar) ad2kis[asciiKucult(a)] = k; }
+  const KIS = "((?:[a-z]\\.?){1,7}k\\.?|aihs|anayasa|ay|is\\s?k(?:anunu)?)";
+  const EK = "(?:'?n[iu]n|'?nda|'?nde|'?na|'?ne|'?ya|'?ye)?";
+  const MADDE = "\\s*(?:(m(?:adde(?:si|sinin|sinde|sine)?|d)?)\\.?\\s*)?(?:(gecici|ek)\\s*)?(\\d{1,4})(?!\\d)(?:\\s*[./]\\s*\\d{1,2})?";
+  const adlar = Object.keys(ad2kis).sort((a, b) => b.length - a.length).map(kacR).join("|");
+  const desenler = [
+    [new RegExp("(?:^|[^a-z])" + KIS + EK + MADDE, "gu"), "kis"],
+    [new RegExp("(?:^|[^a-z])(" + adlar + ")" + EK + "[^.\\d]{0,20}?" + MADDE, "gu"), "ad"],
+    [new RegExp("\\b(\\d{3,4})\\s*sayili\\s*(?:turk\\s+)?[a-z' ]{0,50}?(?:kanun|yasa|sozlesme)[^.\\d]{0,30}?" + MADDE, "gu"), "no"],
+    [/\b(?:(gecici|ek)\s*)?(\d{1,4})\s*\.?\s*(?:madde|md)\b|\bmadde\s*(\d{1,4})\b/gu, "madde"],
+  ];
+  const etiket = new Map();  // anahtar -> etiket (aynı madde için tek etiket)
+  for (const [desen, tur] of desenler) for (const e of sorgu.matchAll(desen)) {
+    if (tur === "madde") { const tip = e[1], n = +(e[2] || e[3]); const k = `${tip ? (tip.startsWith("ge") ? "gecici" : "ek") : "madde"}:${n}`; if (!etiket.has(k)) etiket.set(k, `${tip ? tip + " " : ""}madde ${n}`); continue; }
+    const [, ham, maddeKelimesi, tip, no] = e;
+    if (!maddeKelimesi && !tip && no2kis[no]) continue;  // "4054 sayılı RKHK": sayı kanun numarası
+    const kis = tur === "kis" ? kisaltmaAnahtari(ham) : tur === "ad" ? (ad2kis[ham] || "kanun") : (no2kis[ham] || "kanun" + ham);
+    const k = `${kis}:${onEk(tip)}${+no}`;
+    if (!etiket.has(k)) etiket.set(k, `${KANUNLAR[kis] ? (KANUNLAR[kis].adlar[0].length <= 12 ? KANUNLAR[kis].adlar[0] : kis.toUpperCase()) : tur === "no" ? ham + " sayılı Kanun" : ham.toUpperCase().replace(/\./g, "")} ${tip ? tip + " " : ""}m. ${+no}`);
+  }
+  return { anahtarlar: [...etiket.keys()], etiketler: [...etiket.values()] };
 }
 let atifDizini = null;
 async function atifDizinYukle() { if (!atifDizini) atifDizini = fetch("veri/atif.json").then(r => r.json()); return atifDizini; }
+async function kanunlarYukle() { if (!KANUNLAR) KANUNLAR = await fetch("veri/kanunlar.json").then(r => r.json()); }
 
 const kacis = t => t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 const kucult = t => t.toLocaleLowerCase("tr");
@@ -145,6 +165,7 @@ async function ara() {
     const skor = new Float32Array(n);
     for (let i = 0; i < n; i++) { let s = 0; const o = i * boyut; for (let j = 0; j < boyut; j++) s += qv[j] * vektorler[o + j]; skor[i] = s * olcek[i]; }
     // Sorguda kanun maddesi atfı varsa, o atfı içeren parçalar öne alınır
+    await kanunlarYukle();
     const atif = atiflariBul(sorgu);
     let aday = null, bilgi = "";
     if (atif.anahtarlar.length) {
