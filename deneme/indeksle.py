@@ -59,6 +59,7 @@ def main():
     p.add_argument("--indeks", default=str(KOK / "deneme" / "indeks"))
     p.add_argument("--model", default=str(TEMEL_MODEL))
     p.add_argument("--parca-boyu", type=int, default=700)
+    p.add_argument("--dosya-sinir", type=int, default=0, help="Dosya başına en çok bu kadar karakter indekslenir (0 = sınırsız)")
     a = p.parse_args()
 
     dosyalar = sorted(f for f in Path(a.klasor).rglob("*") if f.suffix.lower() in UZANTILAR)
@@ -68,7 +69,10 @@ def main():
     kayitlar = []
     for f in dosyalar:
         try:
-            parcalar = parcala(metin_cikar(f), a.parca_boyu)
+            metin = metin_cikar(f)
+            if a.dosya_sinir and len(metin) > a.dosya_sinir:
+                metin = metin[: a.dosya_sinir]
+            parcalar = parcala(metin, a.parca_boyu)
         except Exception as e:
             print(f"Atlandı {f}: {e}", file=sys.stderr)
             continue

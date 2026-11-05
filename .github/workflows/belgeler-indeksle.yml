@@ -1,7 +1,8 @@
-name: Belgeleri indeksle (release zip'inden)
+name: Belgeleri metne çevir (release zip'inden)
 
-# Drive'dan elle indirilip release'e eklenen zip'leri açar, ince ayarlı modelle indeksler,
-# tarayıcı verisini (web/veri) üretip main'e commit eder. Google API'ye dokunmaz.
+# Drive'dan elle indirilip release'e eklenen zip'leri açar, belgeleri düz metne çevirir ve
+# metin arşivini (metin.tar.gz) aynı release'e yükler. İndeksleme ayrıca yapılır; GitHub'ın
+# CPU'su 1,6 milyon parçayı vektörlemek için çok yavaş (55 saat).
 
 on:
   workflow_dispatch:
@@ -10,10 +11,6 @@ on:
         description: Zip'lerin bulunduğu release tag'i
         required: true
         default: belgeler
-      parca_boyu:
-        description: Parça boyu (karakter); büyük değer daha az parça demektir
-        required: true
-        default: "1000"
 
 jobs:
   indeksle:
@@ -30,8 +27,7 @@ jobs:
 
       - name: Bağımlılıklar
         run: |
-          pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install -r requirements.txt
+          pip install pypdf python-docx
 
       - name: Önceki çalıştırmadan çevrilmiş metinleri geri yükle
         uses: actions/cache/restore@v4
@@ -70,32 +66,15 @@ jobs:
           path: /tmp/metin
           key: metin-${{ inputs.tag }}-${{ github.run_id }}
 
-      - name: İndeksle
-        if: steps.cevir.outputs.tamam == 'true'
-        run: |
-          sh modeller/e5-small-mmarco-tr/birlestir.sh
-          python deneme/indeksle.py --klasor /tmp/metin --indeks /tmp/indeks --model modeller/e5-small-mmarco-tr --parca-boyu "${{ inputs.parca_boyu }}"
-          cat /tmp/indeks/bilgi.json
-          python egitim/web_veri.py --indeks /tmp/indeks --cikti web/veri
-
-      - name: İndeksi release'e yükle (sunucu sürümü için)
+      - name: Metin arşivini release'e yükle
         if: steps.cevir.outputs.tamam == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tar -C /tmp -czf /tmp/indeks.tar.gz indeks
-          gh release upload "${{ inputs.tag }}" /tmp/indeks.tar.gz --clobber
-
-      - name: Tarayıcı verisini main'e commit et
-        if: steps.cevir.outputs.tamam == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add -A web/veri
-          git diff --cached --quiet && { echo "Değişiklik yok"; exit 0; }
-          git commit -q -m "web/veri: belge indeksi güncellendi ($(python -c "import json;b=json.load(open('/tmp/indeks/bilgi.json'));print(b['dosya_sayisi'],'dosya,',b['parca_sayisi'],'parça')"))"
-          git push
-          echo "Not: bu push Space yayınını tetiklemez; 'Hugging Face Space'e yayınla' iş akışını elle çalıştırın."
+          tar -C /tmp -czf /tmp/metin.tar.gz metin
+          ls -la /tmp/metin.tar.gz
+          gh release upload "${{ inputs.tag }}" /tmp/metin.tar.gz --clobber
+          echo "Yüklendi: metin.tar.gz"
 
       - name: Devam gerekiyor mu
         if: steps.cevir.outputs.tamam != 'true'
