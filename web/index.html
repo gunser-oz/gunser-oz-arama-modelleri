@@ -61,7 +61,14 @@ env.localModelPath = "./";
 
 const $ = s => document.querySelector(s);
 const durum = m => $("#durum").textContent = m;
-let model, vektorler, kayitlar, boyut;
+let model, vektorler, olcek, meta, boyut;
+const metinOnbellek = new Map();
+async function metinGetir(i) {
+  // Metinler 200'er parçalık gruplarda; yalnızca gösterilecek sonuçların grubu çekilir
+  const g = Math.floor(i / meta.grup);
+  if (!metinOnbellek.has(g)) metinOnbellek.set(g, fetch(`veri/metin/${String(g).padStart(4, "0")}.json`).then(r => r.json()));
+  return (await metinOnbellek.get(g))[i % meta.grup];
+}
 
 function f16toF32(u16) {
   // Float16 → Float32 (tarayıcıda Float16Array her yerde yok)
@@ -75,17 +82,16 @@ function f16toF32(u16) {
 
 async function yukle() {
   try {
-    const [kayitYanit, vekYanit] = await Promise.all([fetch("veri/kayitlar.json"), fetch("veri/vektorler.f16")]);
-    const k = await kayitYanit.json();
-    kayitlar = k.kayitlar; boyut = k.boyut;
-    vektorler = f16toF32(new Uint16Array(await vekYanit.arrayBuffer()));
+    const [metaYanit, vekYanit, olcekYanit] = await Promise.all([fetch("veri/meta.json"), fetch("veri/vektorler.i8"), fetch("veri/olcek.f16")]);
+    meta = await metaYanit.json(); boyut = meta.boyut;
+    vektorler = new Int8Array(await vekYanit.arrayBuffer());
+    olcek = f16toF32(new Uint16Array(await olcekYanit.arrayBuffer()));
     model = await pipeline("feature-extraction", "model", {
       dtype: "q8",
       progress_callback: p => { if (p.status === "progress" && p.file.endsWith(".onnx")) $("#bar").style.width = p.progress.toFixed(0) + "%"; },
     });
     $("#bar").style.width = "100%";
-    const dosya = new Set(kayitlar.map(x => x.dosya)).size;
-    durum(`Hazır · ${dosya} dosya, ${kayitlar.length} parça indeksli · model tarayıcıda çalışıyor`);
+    durum(`Hazır · ${meta.dosyalar.length} dosya, ${meta.adet} parça indeksli · model tarayıcıda çalışıyor`);
     $("#araBtn").disabled = false;
   } catch (e) { $("#hata").textContent = "Yükleme hatası: " + e.message; durum("Yüklenemedi"); }
 }
@@ -118,19 +124,21 @@ async function ara() {
   $("#araBtn").disabled = true;
   try {
     const q = await model("query: " + sorgu, { pooling: "mean", normalize: true });
-    const qv = q.data, k = +$("#k").value, n = kayitlar.length;
+    const qv = q.data, k = +$("#k").value, n = meta.adet;
     const skor = new Float32Array(n);
-    for (let i = 0; i < n; i++) { let s = 0; const o = i * boyut; for (let j = 0; j < boyut; j++) s += qv[j] * vektorler[o + j]; skor[i] = s; }
+    for (let i = 0; i < n; i++) { let s = 0; const o = i * boyut; for (let j = 0; j < boyut; j++) s += qv[j] * vektorler[o + j]; skor[i] = s * olcek[i]; }
     const sira = Array.from(skor.keys()).sort((a, b) => skor[b] - skor[a]).slice(0, k);
+    const metinler = await Promise.all(sira.map(metinGetir));
+    const ad = i => meta.dosyalar[meta.dosya[i]];
     $("#sonuclar").style.display = "block";
-    $("#sonuclar").innerHTML = sira.map(i => `<div class="sonuc" id="s${i}"><div class="kaynak">${kacis(kayitlar[i].dosya)}</div>${kelimeleriVurgula(kayitlar[i].metin, sorgu)}<div class="skor">benzerlik ${skor[i].toFixed(3)} · en yakın cümle aranıyor…</div></div>`).join("");
+    $("#sonuclar").innerHTML = sira.map((i, r) => `<div class="sonuc" id="s${i}"><div class="kaynak">${kacis(ad(i))}</div>${kelimeleriVurgula(metinler[r], sorgu)}<div class="skor">benzerlik ${skor[i].toFixed(3)} · en yakın cümle aranıyor…</div></div>`).join("");
     // Her sonuçta sorguya en yakın cümleyi işaretle
-    for (const i of sira) {
-      const { idx, cumleler } = await enYakinCumle(kayitlar[i].metin, qv);
+    for (const [r, i] of sira.entries()) {
+      const { idx, cumleler } = await enYakinCumle(metinler[r], qv);
       const el = document.getElementById("s" + i); if (!el) continue;
-      const govde = idx < 0 ? kelimeleriVurgula(kayitlar[i].metin, sorgu)
+      const govde = idx < 0 ? kelimeleriVurgula(metinler[r], sorgu)
         : cumleler.map((c, j) => j === idx ? `<mark>${kelimeleriVurgula(c, sorgu)}</mark>` : kelimeleriVurgula(c, sorgu)).join(" ");
-      el.innerHTML = `<div class="kaynak">${kacis(kayitlar[i].dosya)}</div>${govde}<div class="skor">benzerlik ${skor[i].toFixed(3)}</div>`;
+      el.innerHTML = `<div class="kaynak">${kacis(ad(i))}</div>${govde}<div class="skor">benzerlik ${skor[i].toFixed(3)}</div>`;
     }
   } catch (e) { $("#hata").textContent = "Arama hatası: " + e.message; }
   finally { $("#araBtn").disabled = false; }

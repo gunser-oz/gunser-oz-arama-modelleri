@@ -131,3 +131,10 @@ python egitim/onnx_aktar.py --model modeller/e5-small-mmarco-tr --cikti web/mode
 `egitim/colab_egitim.ipynb` defterini Colab'da açın, T4 GPU seçin ve hücreleri sırayla çalıştırın.
 Tam veriyle eğitim yaklaşık 10 dakika sürer; sonuç `model-gpu` release'ine yüklenir.
 Doğrudan açmak için: https://colab.research.google.com/github/gunser-oz/gunser-oz-arama-modelleri/blob/main/egitim/colab_egitim.ipynb
+
+## Drive belgelerini zip ile indeksleme (önerilen)
+
+Drive API ile toplu indirme Google'ın kötüye kullanım uyarılarını tetikleyebilir. Bunun yerine klasörü
+Drive'dan elle indirin (sağ tık → İndir), zip'i `belgeler` adlı release'e ekleyin ve
+"Belgeleri indeksle (release zip'inden)" iş akışını çalıştırın. İş akışı indeksi kurar, `web/veri`
+klasörünü günceller ve main'e commit eder; ardından "Hugging Face Space'e yayınla" iş akışını çalıştırın.
