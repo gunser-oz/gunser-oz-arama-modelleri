@@ -105,3 +105,11 @@ tar -xzf drive_indeks.tar.gz && python deneme/sunucu.py --indeks indeks
 ```bash
 sh modeller/e5-small-mmarco-tr/birlestir.sh
 ```
+
+## Web'den kullanım (Hugging Face Spaces)
+
+Depo, Docker ile Hugging Face Space olarak yayınlanır; sayfa `ARAMA_SIFRE` ile korunur.
+Kurulum: huggingface.co'da Docker türünde bir Space açın, write yetkili bir token alın,
+GitHub repo secret'larına `HF_TOKEN` ve `HF_SPACE` (ör. `kullanici/arama`) ekleyin,
+Space ayarlarına `ARAMA_SIFRE` adlı gizli değişken koyun. "Hugging Face Space'e yayınla"
+iş akışı her main güncellemesinde uygulamayı gönderir.

@@ -1,10 +1,11 @@
-cikti/
+cikti/*
+!cikti/degerlendirme.json
 __pycache__/
 *.pyc
 egitim/*.jsonl
 !egitim/veri_ornek.jsonl
 egitim/veri/
-deneme/indeks/
+
 belgelerim/
 credentials.json
 token.json

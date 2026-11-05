@@ -10,11 +10,14 @@ Sonra tarayıcıda http://localhost:8000 açın.
 """
 import argparse
 import json
+import os
+import secrets
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 
@@ -29,7 +32,13 @@ p.add_argument("--belgeler", default=str(BURASI / "belgeler.txt"))
 p.add_argument("--indeks", default=None, help="indeksle.py çıktısı; verilirse --belgeler yok sayılır")
 p.add_argument("--port", type=int, default=8000)
 p.add_argument("--rapor", default=str(KOK / "cikti" / "degerlendirme.json"), help="degerlendir.py --rapor çıktısı")
+p.add_argument("--sifre", default=os.environ.get("ARAMA_SIFRE"), help="Verilirse sayfa kullanıcı adı 'arama' ve bu şifreyle korunur")
 a = p.parse_args()
+# Bulut ortamında (Hugging Face Spaces vb.) ortam değişkenleri komut satırını ezer
+a.model = os.environ.get("ARAMA_MODEL", a.model)
+a.karsilastir = os.environ.get("ARAMA_KARSILASTIR", a.karsilastir)
+a.indeks = os.environ.get("ARAMA_INDEKS", a.indeks)
+a.port = int(os.environ.get("PORT", a.port))
 
 if a.indeks:
     # indeksle.py ile hazırlanmış FAISS indeksi: belgeler ve vektörler diskten gelir
@@ -64,7 +73,18 @@ else:
     }
     faiss_indeks = None
 
-app = FastAPI()
+_guvenlik = HTTPBasic(auto_error=False)
+
+
+def giris(kim: HTTPBasicCredentials | None = Depends(_guvenlik)):
+    """ARAMA_SIFRE tanımlıysa tarayıcıdan kullanıcı adı/şifre ister."""
+    if not a.sifre:
+        return
+    if kim is None or not (secrets.compare_digest(kim.username, "arama") and secrets.compare_digest(kim.password, a.sifre)):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, headers={"WWW-Authenticate": "Basic"})
+
+
+app = FastAPI(dependencies=[Depends(giris)])
 
 
 class Sorgu(BaseModel):

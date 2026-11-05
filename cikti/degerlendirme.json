@@ -1,0 +1,19 @@
+{
+  "veri": "egitim/veri/mmarco_tr_100000.jsonl",
+  "sorgu_sayisi": 1000,
+  "pasaj_sayisi": 6058,
+  "modeller": {
+    "modeller/intfloat-multilingual-e5-small": {
+      "ndcg@10": 0.8592,
+      "mrr@10": 0.8334,
+      "recall@1": 0.769,
+      "recall@10": 0.938
+    },
+    "cikti/e5-small-mmarco-tr/final": {
+      "ndcg@10": 0.869,
+      "mrr@10": 0.846,
+      "recall@1": 0.787,
+      "recall@10": 0.939
+    }
+  }
+}
