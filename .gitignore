@@ -9,3 +9,4 @@ belgelerim/
 credentials.json
 token.json
 *.png
+!modeller/e5-small-mmarco-tr/
