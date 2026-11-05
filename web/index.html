@@ -47,7 +47,11 @@
 </main>
 <script type="module">
 import { pipeline, env } from "./lib/transformers.min.js";
-env.backends.onnx.wasm.wasmPaths = new URL("./lib/", location.href).href;
+// Statik sunucular .mjs uzantısını JavaScript olarak sunmayabiliyor; dosyaları açık adla ver
+env.backends.onnx.wasm.wasmPaths = {
+  mjs: new URL("./lib/ort-wasm-simd-threaded.jsep.js", location.href).href,
+  wasm: new URL("./lib/ort-wasm-simd-threaded.jsep.wasm", location.href).href,
+};
 env.allowRemoteModels = false;
 env.allowLocalModels = true;
 env.localModelPath = "./";
