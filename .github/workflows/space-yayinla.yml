@@ -25,6 +25,7 @@ jobs:
           # Belge verisi depoda değil, 'belgeler' release'indeki web_veri.tar.gz'den gelir
           rm -rf web/veri && curl -sL -o /tmp/web_veri.tar.gz "https://github.com/${{ github.repository }}/releases/download/belgeler/web_veri.tar.gz"
           tar -xzf /tmp/web_veri.tar.gz -C /tmp && mv /tmp/web_veri web/veri && ls web/veri
+          python3 egitim/atif_indeksi.py --veri web/veri
           cd web
           printf '%s\n' "---" "title: Günser Öz Arama" "emoji: ⚖️" "colorFrom: blue" "colorTo: gray" "sdk: static" "pinned: false" "---" "" \
             "Türkçe anlamsal belge araması. Model tarayıcıda çalışır, sorgular sunucuya gitmez." \

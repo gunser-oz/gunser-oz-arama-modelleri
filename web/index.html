@@ -30,6 +30,8 @@
   .skor { font-size:12px; color:var(--soluk); margin-top:4px; }
   .not { font-size:12px; color:var(--soluk); margin-top:8px; }
   .hata { color:#d1242f; font-size:14px; }
+  .bilgi { font-size:13px; color:var(--soluk); padding:0 0 10px; }
+  .etiket { display:inline-block; font-size:11px; background:var(--vurgu); color:#fff; border-radius:4px; padding:1px 6px; margin-left:6px; vertical-align:middle; }
 </style>
 </head>
 <body>
@@ -96,6 +98,21 @@ async function yukle() {
   } catch (e) { $("#hata").textContent = "Yükleme hatası: " + e.message; durum("Yüklenemedi"); }
 }
 
+// ---- Kanun maddesi atıfları (ör. "tck 181", "HMK m. 166", "5237 sayılı Kanun'un 181. maddesi") ----
+const KANUN_NO = { "5237":"tck","5271":"cmk","6100":"hmk","4721":"tmk","6098":"tbk","6102":"ttk","2004":"iik","4857":"isk","2577":"iyuk","213":"vuk","6698":"kvkk","6502":"tkhk","1086":"humk","5510":"sgk","4734":"kik","4054":"rkhk","2709":"anayasa","2918":"ktk","6183":"aatuhk","193":"gvk","5520":"kvk","3065":"kdv","6769":"smk","5846":"fsek","7201":"tebligat","657":"dmk","6325":"arabuluculuk","4686":"tahkim" };
+const KISALTMA = "(?:T\\.?C\\.?K|C\\.?M\\.?K|H\\.?M\\.?K|T\\.?M\\.?K|T\\.?B\\.?K|T\\.?T\\.?K|İ\\.?İ\\.?K|H\\.?U\\.?M\\.?K|İ\\.?Y\\.?U\\.?K|V\\.?U\\.?K|K\\.?V\\.?K\\.?K|T\\.?K\\.?H\\.?K|S\\.?M\\.?K|F\\.?S\\.?E\\.?K|K\\.?T\\.?K|A\\.?A\\.?T\\.?U\\.?H\\.?K|G\\.?V\\.?K|K\\.?V\\.?K|K\\.?İ\\.?K|R\\.?K\\.?H\\.?K|D\\.?M\\.?K|İş\\s?K(?:anunu)?|AİHS|Anayasa)";
+const MADDE = "(?:'?[nN]ın|'?[nN]in|'?[nN]un|'?[nN]ün|'?nda|'?nde)?\\s*(?:m(?:adde(?:si|sinin|sinde)?|d)?\\.?\\s*)?(\\d{1,4})(?:\\s*[./]\\s*\\d{1,2})?";
+const kisalt = k => k.replace(/[. ]/g, "").replace(/İ/g, "i").replace(/I/g, "i").toLowerCase().replace(/ı/g,"i").replace(/ş/g,"s").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/ğ/g,"g").replace("iskanunu","isk");
+function atiflariBul(sorgu) {
+  const anahtarlar = new Set(), etiketler = [];
+  for (const e of sorgu.matchAll(new RegExp("\\b(" + KISALTMA + ")" + MADDE, "giu"))) { anahtarlar.add(`${kisalt(e[1])}:${+e[2]}`); etiketler.push(`${e[1].toUpperCase().replace(/\./g,"")} ${+e[2]}`); }
+  for (const e of sorgu.matchAll(/\b(\d{3,4})\s*sayılı\s*(?:Türk\s+)?[\p{L}' ]{0,40}?(?:Kanun|Yasa)[^.\d]{0,30}?(\d{1,4})\s*\.?\s*(?:madde|md|m)/giu)) { const ad = KANUN_NO[e[1]] || "kanun" + e[1]; anahtarlar.add(`${ad}:${+e[2]}`); etiketler.push(`${e[1]} sayılı Kanun m. ${+e[2]}`); }
+  if (!anahtarlar.size) for (const e of sorgu.matchAll(/\b(\d{1,4})\s*\.?\s*madde|\bmadde\s*(\d{1,4})\b/giu)) { const n = +(e[1] || e[2]); anahtarlar.add(`madde:${n}`); etiketler.push(`madde ${n}`); }
+  return { anahtarlar: [...anahtarlar], etiketler };
+}
+let atifDizini = null;
+async function atifDizinYukle() { if (!atifDizini) atifDizini = fetch("veri/atif.json").then(r => r.json()); return atifDizini; }
+
 const kacis = t => t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 const kucult = t => t.toLocaleLowerCase("tr");
 const DURAK = new Set(["için", "gibi", "olan", "olarak", "nasıl", "nedir", "midir", "mıdır", "ile", "veya", "ama", "daha", "çok", "bir", "bu", "şu", "ne", "mi", "mı", "mu", "mü"]);
@@ -127,18 +144,34 @@ async function ara() {
     const qv = q.data, k = +$("#k").value, n = meta.adet;
     const skor = new Float32Array(n);
     for (let i = 0; i < n; i++) { let s = 0; const o = i * boyut; for (let j = 0; j < boyut; j++) s += qv[j] * vektorler[o + j]; skor[i] = s * olcek[i]; }
-    const sira = Array.from(skor.keys()).sort((a, b) => skor[b] - skor[a]).slice(0, k);
+    // Sorguda kanun maddesi atfı varsa, o atfı içeren parçalar öne alınır
+    const atif = atiflariBul(sorgu);
+    let aday = null, bilgi = "";
+    if (atif.anahtarlar.length) {
+      const dizin = await atifDizinYukle();
+      const idler = new Set(); for (const a of atif.anahtarlar) for (const i of (dizin[a] || [])) idler.add(i);
+      const et = atif.etiketler.join(", ");
+      if (idler.size) { aday = idler; bilgi = `<div class="bilgi">${kacis(et)} atfı geçen ${idler.size} parça önce listelendi; sıralama anlam benzerliğine göre.</div>`; }
+      else bilgi = `<div class="bilgi">Arşivde "${kacis(et)}" atfı geçen belge bulunamadı; anlamca en yakın sonuçlar gösteriliyor.</div>`;
+    }
+    let sira;
+    if (aday) {
+      const once = [...aday].sort((a, b) => skor[b] - skor[a]).slice(0, k);
+      const kalan = k - once.length;
+      sira = kalan > 0 ? once.concat(Array.from(skor.keys()).filter(i => !aday.has(i)).sort((a, b) => skor[b] - skor[a]).slice(0, kalan)) : once;
+    } else sira = Array.from(skor.keys()).sort((a, b) => skor[b] - skor[a]).slice(0, k);
     const metinler = await Promise.all(sira.map(metinGetir));
     const ad = i => meta.dosyalar[meta.dosya[i]];
+    const rozet = i => aday && aday.has(i) ? `<span class="etiket">atıf eşleşti</span>` : "";
     $("#sonuclar").style.display = "block";
-    $("#sonuclar").innerHTML = sira.map((i, r) => `<div class="sonuc" id="s${i}"><div class="kaynak">${kacis(ad(i))}</div>${kelimeleriVurgula(metinler[r], sorgu)}<div class="skor">benzerlik ${skor[i].toFixed(3)} · en yakın cümle aranıyor…</div></div>`).join("");
+    $("#sonuclar").innerHTML = bilgi + sira.map((i, r) => `<div class="sonuc" id="s${i}"><div class="kaynak">${kacis(ad(i))}${rozet(i)}</div>${kelimeleriVurgula(metinler[r], sorgu)}<div class="skor">benzerlik ${skor[i].toFixed(3)} · en yakın cümle aranıyor…</div></div>`).join("");
     // Her sonuçta sorguya en yakın cümleyi işaretle
     for (const [r, i] of sira.entries()) {
       const { idx, cumleler } = await enYakinCumle(metinler[r], qv);
       const el = document.getElementById("s" + i); if (!el) continue;
       const govde = idx < 0 ? kelimeleriVurgula(metinler[r], sorgu)
         : cumleler.map((c, j) => j === idx ? `<mark>${kelimeleriVurgula(c, sorgu)}</mark>` : kelimeleriVurgula(c, sorgu)).join(" ");
-      el.innerHTML = `<div class="kaynak">${kacis(ad(i))}</div>${govde}<div class="skor">benzerlik ${skor[i].toFixed(3)}</div>`;
+      el.innerHTML = `<div class="kaynak">${kacis(ad(i))}${rozet(i)}</div>${govde}<div class="skor">benzerlik ${skor[i].toFixed(3)}</div>`;
     }
   } catch (e) { $("#hata").textContent = "Arama hatası: " + e.message; }
   finally { $("#araBtn").disabled = false; }
