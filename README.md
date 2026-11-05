@@ -125,3 +125,9 @@ Tarayıcı modelini ve verisini yeniden üretmek için:
 ```bash
 python egitim/onnx_aktar.py --model modeller/e5-small-mmarco-tr --cikti web/model
 ```
+
+## GPU'da eğitim (Google Colab, ücretsiz)
+
+`egitim/colab_egitim.ipynb` defterini Colab'da açın, T4 GPU seçin ve hücreleri sırayla çalıştırın.
+Tam veriyle eğitim yaklaşık 10 dakika sürer; sonuç `model-gpu` release'ine yüklenir.
+Doğrudan açmak için: https://colab.research.google.com/github/gunser-oz/gunser-oz-arama-modelleri/blob/main/egitim/colab_egitim.ipynb

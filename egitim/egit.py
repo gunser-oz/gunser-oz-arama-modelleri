@@ -45,6 +45,7 @@ def main():
     p.add_argument("--en-fazla", type=int, default=0, help="En fazla bu kadar satırla eğit (0 = hepsi)")
     p.add_argument("--maks-uzunluk", type=int, default=256, help="Token cinsinden en uzun girdi")
     p.add_argument("--kaydet-adim", type=int, default=200, help="Bu kadar adımda bir ara kayıt (0 = kapalı)")
+    p.add_argument("--fp16", action="store_true", help="GPU'da yarı hassasiyet (daha hızlı)")
     p.add_argument("--devam", default=None, help="Ara kayıt klasörü (ör. cikti/x/checkpoint-450); eğitime oradan devam eder")
     a = p.parse_args()
 
@@ -73,6 +74,7 @@ def main():
         per_device_train_batch_size=a.batch,
         learning_rate=a.lr,
         warmup_steps=0.1,  # oran olarak (transformers v5)
+        fp16=a.fp16,
         batch_sampler="no_duplicates",
         eval_strategy="epoch" if dogrulama else "no",
         save_strategy="steps" if a.kaydet_adim else "no",
