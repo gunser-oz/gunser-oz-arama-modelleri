@@ -75,3 +75,33 @@ Temel modeli ve ince ayarlı modeli aynı test kümesinde karşılaştırır (nD
 python egitim/degerlendir.py --veri mmarco_tr_100000.jsonl --test 5000 --sorgu 1000 \
     --model modeller/intfloat-multilingual-e5-small --model cikti/e5-small-mmarco-tr/final
 ```
+
+## Google Drive arşivini indeksleme
+
+Drive'daki tüm belgeleri (binlerce karar) indekslemenin iki yolu vardır:
+
+**Kendi makinenizde** (bir kez OAuth izni gerekir, adımlar `deneme/drive_indir.py` başında):
+
+```bash
+python deneme/drive_indir.py --klasor-id <klasör kimliği> --hedef belgelerim
+python deneme/indeksle.py --klasor belgelerim --indeks deneme/indeks --model modeller/e5-small-mmarco-tr
+python deneme/sunucu.py --indeks deneme/indeks
+```
+
+**GitHub Actions ile** ("Drive belgelerini indeksle" iş akışı): bir Google servis hesabı oluşturup JSON
+anahtarını `GDRIVE_SERVIS_HESABI` adlı repo secret'ına koyun, Drive klasörünü servis hesabının
+e-postasıyla paylaşın, iş akışını klasör kimliğiyle çalıştırın. İndeks `drive-indeks` release'ine yüklenir:
+
+```bash
+curl -L -o drive_indeks.tar.gz https://github.com/gunser-oz/gunser-oz-arama-modelleri/releases/download/drive-indeks/drive_indeks.tar.gz
+tar -xzf drive_indeks.tar.gz && python deneme/sunucu.py --indeks indeks
+```
+
+## İnce ayarlı model
+
+`modeller/e5-small-mmarco-tr/` Türkçe MS MARCO ile ince ayarlanmış sürümdür. Ağırlıklar GitHub'ın
+100 MB sınırı yüzünden parçalı durur; kullanmadan önce birleştirin:
+
+```bash
+sh modeller/e5-small-mmarco-tr/birlestir.sh
+```

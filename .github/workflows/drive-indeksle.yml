@@ -1,0 +1,67 @@
+name: Drive belgelerini indeksle
+
+# Google Drive'daki belgeleri servis hesabıyla indirir, FAISS indeksi kurar ve
+# indeksi release'e yükler. Depoya belge girmez.
+#
+# Gereken secret: GDRIVE_SERVIS_HESABI  (servis hesabı JSON anahtarının içeriği)
+# Drive klasörü servis hesabının e-postasıyla paylaşılmış olmalı.
+
+on:
+  workflow_dispatch:
+    inputs:
+      klasor_id:
+        description: Drive klasör kimliği (adres çubuğundaki son parça)
+        required: true
+      tag:
+        description: Release tag
+        required: true
+        default: drive-indeks
+      model:
+        description: Vektörleyen model klasörü
+        required: true
+        default: modeller/e5-small-mmarco-tr
+
+jobs:
+  indeksle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          lfs: true
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Bağımlılıklar
+        run: |
+          pip install -r requirements.txt google-api-python-client google-auth
+
+      - name: Model ağırlıklarını hazırla
+        run: |
+          [ -f "${{ inputs.model }}/birlestir.sh" ] && sh "${{ inputs.model }}/birlestir.sh" || true
+
+      - name: Drive'dan indir
+        env:
+          GDRIVE_SERVIS_HESABI: ${{ secrets.GDRIVE_SERVIS_HESABI }}
+        run: |
+          [ -n "$GDRIVE_SERVIS_HESABI" ] || { echo "GDRIVE_SERVIS_HESABI secret tanımlı değil"; exit 1; }
+          echo "$GDRIVE_SERVIS_HESABI" > /tmp/sa.json
+          python deneme/drive_indir.py --servis-hesabi /tmp/sa.json --klasor-id "${{ inputs.klasor_id }}" --hedef /tmp/belgeler
+          find /tmp/belgeler -type f | wc -l
+
+      - name: İndeksle
+        run: |
+          python deneme/indeksle.py --klasor /tmp/belgeler --indeks /tmp/indeks --model "${{ inputs.model }}"
+          cat /tmp/indeks/bilgi.json
+
+      - name: Release'e yükle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar -C /tmp -czf /tmp/drive_indeks.tar.gz indeks
+          gh release view "${{ inputs.tag }}" >/dev/null 2>&1 || \
+            gh release create "${{ inputs.tag }}" --title "Drive belge indeksi" --notes "indeksle.py ile üretildi"
+          gh release upload "${{ inputs.tag }}" /tmp/drive_indeks.tar.gz --clobber

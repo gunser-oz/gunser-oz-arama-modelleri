@@ -84,9 +84,15 @@ def main():
     p.add_argument("--hedef", default="belgelerim")
     p.add_argument("--kimlik", default="credentials.json")
     p.add_argument("--token", default="token.json")
+    p.add_argument("--servis-hesabi", default=None, help="Servis hesabı JSON anahtarı (etkileşimsiz)")
     a = p.parse_args()
     from googleapiclient.discovery import build
-    servis = build("drive", "v3", credentials=yetki(a.kimlik, a.token))
+    if a.servis_hesabi:
+        from google.oauth2 import service_account
+        kim = service_account.Credentials.from_service_account_file(a.servis_hesabi, scopes=KAPSAM)
+    else:
+        kim = yetki(a.kimlik, a.token)
+    servis = build("drive", "v3", credentials=kim)
     indir(servis, a.klasor_id, Path(a.hedef))
 
 
