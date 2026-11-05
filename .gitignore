@@ -12,3 +12,4 @@ credentials.json
 token.json
 *.png
 !modeller/e5-small-mmarco-tr/
+modeller/e5-small-mmarco-tr/model.safetensors
